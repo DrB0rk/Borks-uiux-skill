@@ -58,7 +58,14 @@ The layout is [progressive disclosure](https://en.wikipedia.org/wiki/Progressive
 
 ### Claude Code / OMP (recommended)
 
-Clone into your skills directory:
+Agents discover a skill when `SKILL.md` sits directly inside a folder named after it, so clone the repo and point at the skill directory:
+
+```bash
+git clone https://github.com/DrB0rk/Borks-uiux-skill.git
+cp -r Borks-uiux-skill/skills/bizar-uiux ~/.agents/skills/bizar-uiux
+```
+
+Or clone straight to that path:
 
 ```bash
 git clone https://github.com/DrB0rk/Borks-uiux-skill.git ~/.agents/skills/bizar-uiux
@@ -74,10 +81,10 @@ Ask your agent:
 What does the bizar-uiux skill do?
 ```
 
-It should describe UI/UX design and review using behavioral principles. To confirm the files are in place:
+It should describe UI/UX design and review using behavioral principles. To confirm the files landed correctly:
 
 ```bash
-ls ~/.agents/skills/bizar-uiux
+ls ~/.agents/skills/bizar-uiux/SKILL.md
 ```
 
 ### Already using BizarHarness-OMP?
