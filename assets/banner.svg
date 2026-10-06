@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360" role="img" aria-labelledby="bannerTitle bannerDesc">
+  <title id="bannerTitle">Bizar UI/UX</title>
+  <desc id="bannerDesc">Banner for the Bizar UI/UX skill: design and review interfaces with behavioral design principles. The artwork demonstrates visual hierarchy, Gestalt grouping, and the isolation effect.</desc>
+
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0A0E1A"/>
+      <stop offset="100%" stop-color="#141D31"/>
+    </linearGradient>
+    <linearGradient id="accentBar" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#6EA8FF"/>
+      <stop offset="100%" stop-color="#8F7CFF"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#6EA8FF" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#6EA8FF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1200" height="360" fill="url(#bg)"/>
+
+  <!-- Rule-of-thirds grid: a faint structural motif, low priority (similarity of low-contrast texture). -->
+  <g stroke="#FFFFFF" stroke-opacity="0.045" stroke-width="1">
+    <line x1="400" y1="0" x2="400" y2="360"/>
+    <line x1="800" y1="0" x2="800" y2="360"/>
+    <line x1="0" y1="120" x2="1200" y2="120"/>
+    <line x1="0" y1="240" x2="1200" y2="240"/>
+  </g>
+
+  <ellipse cx="980" cy="150" rx="330" ry="220" fill="url(#glow)"/>
+
+  <!-- Wordmark -->
+  <rect x="72" y="92" width="46" height="4" rx="2" fill="url(#accentBar)"/>
+  <text x="72" y="164" font-family="'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif" font-size="60" font-weight="700" letter-spacing="-1.5" fill="#F2F5FA">Bizar UI/UX</text>
+  <text x="74" y="206" font-family="'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif" font-size="21" font-weight="400" fill="#A8B3C7">Design and review interfaces with behavioral design principles.</text>
+
+  <!-- Grouped capability chips: proximity binds them into one readable group. -->
+  <g font-family="'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace" font-size="13" fill="#C3CDE0">
+    <g>
+      <rect x="72" y="240" width="150" height="30" rx="15" fill="#FFFFFF" fill-opacity="0.07" stroke="#FFFFFF" stroke-opacity="0.10"/>
+      <text x="147" y="255" text-anchor="middle" dominant-baseline="middle">Gestalt</text>
+    </g>
+    <g>
+      <rect x="232" y="240" width="150" height="30" rx="15" fill="#FFFFFF" fill-opacity="0.07" stroke="#FFFFFF" stroke-opacity="0.10"/>
+      <text x="307" y="255" text-anchor="middle" dominant-baseline="middle">Cognitive load</text>
+    </g>
+    <g>
+      <rect x="392" y="240" width="150" height="30" rx="15" fill="#FFFFFF" fill-opacity="0.07" stroke="#FFFFFF" stroke-opacity="0.10"/>
+      <text x="467" y="255" text-anchor="middle" dominant-baseline="middle">Accessibility</text>
+    </g>
+    <g>
+      <rect x="72" y="278" width="150" height="30" rx="15" fill="#FFFFFF" fill-opacity="0.07" stroke="#FFFFFF" stroke-opacity="0.10"/>
+      <text x="147" y="293" text-anchor="middle" dominant-baseline="middle">Fitts’s law</text>
+    </g>
+    <g>
+      <rect x="232" y="278" width="150" height="30" rx="15" fill="#FFFFFF" fill-opacity="0.07" stroke="#FFFFFF" stroke-opacity="0.10"/>
+      <text x="307" y="293" text-anchor="middle" dominant-baseline="middle">Hierarchy</text>
+    </g>
+    <g>
+      <rect x="392" y="278" width="150" height="30" rx="15" fill="#FFFFFF" fill-opacity="0.07" stroke="#FFFFFF" stroke-opacity="0.10"/>
+      <text x="467" y="293" text-anchor="middle" dominant-baseline="middle">Design tokens</text>
+    </g>
+  </g>
+
+  <!-- Composition study: a cluster of related cards, one isolated by accent and spacing. -->
+  <g>
+    <!-- Primary grouped card -->
+    <rect x="820" y="96" width="150" height="104" rx="12" fill="#FFFFFF" fill-opacity="0.06" stroke="#FFFFFF" stroke-opacity="0.12"/>
+    <rect x="838" y="116" width="74" height="8" rx="4" fill="#FFFFFF" fill-opacity="0.30"/>
+    <rect x="838" y="134" width="114" height="7" rx="3.5" fill="#FFFFFF" fill-opacity="0.16"/>
+    <rect x="838" y="150" width="96" height="7" rx="3.5" fill="#FFFFFF" fill-opacity="0.16"/>
+    <rect x="838" y="174" width="60" height="9" rx="4.5" fill="#FFFFFF" fill-opacity="0.22"/>
+
+    <!-- Related card, uniform connectedness via shared edge alignment -->
+    <rect x="820" y="212" width="150" height="62" rx="12" fill="#FFFFFF" fill-opacity="0.06" stroke="#FFFFFF" stroke-opacity="0.12"/>
+    <rect x="838" y="230" width="88" height="8" rx="4" fill="#FFFFFF" fill-opacity="0.30"/>
+    <rect x="838" y="248" width="60" height="7" rx="3.5" fill="#FFFFFF" fill-opacity="0.16"/>
+
+    <!-- The single isolated element: accent + separation creates singular emphasis. -->
+    <rect x="1002" y="150" width="118" height="124" rx="14" fill="#6EA8FF" fill-opacity="0.16" stroke="#6EA8FF" stroke-opacity="0.75" stroke-width="1.5"/>
+
+    <!-- Closure: a partially drawn progress ring, contained within the card. -->
+    <circle cx="1061" cy="186" r="14" fill="none" stroke="#6EA8FF" stroke-opacity="0.22" stroke-width="3"/>
+    <path d="M1061 172 a 14 14 0 0 1 12.1 7" fill="none" stroke="#8F7CFF" stroke-width="3" stroke-linecap="round"/>
+
+    <rect x="1018" y="216" width="86" height="9" rx="4.5" fill="#F2F5FA" fill-opacity="0.88"/>
+    <rect x="1018" y="234" width="66" height="7" rx="3.5" fill="#FFFFFF" fill-opacity="0.45"/>
+    <rect x="1018" y="250" width="46" height="7" rx="3.5" fill="#FFFFFF" fill-opacity="0.30"/>
+  </g>
+</svg>

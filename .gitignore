@@ -1,0 +1,12 @@
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# Scratch space for skill-creator evaluation runs
+*-workspace/
+eval-viewer/
+__pycache__/
+*.pyc
