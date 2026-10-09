@@ -4,7 +4,7 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-6EA8FF?style=flat-square"></a>
-  <img alt="Skill files" src="https://img.shields.io/badge/skill-12%20files-8F7CFF?style=flat-square">
+  <img alt="Skill files" src="https://img.shields.io/badge/skill-14%20files-8F7CFF?style=flat-square">
   <img alt="No runtime dependencies" src="https://img.shields.io/badge/dependencies-none-3FB950?style=flat-square">
 </p>
 
@@ -16,6 +16,48 @@ Point your agent at a screen, a flow, or a component and this skill audits it ag
 
 > **What it is:** a set of instructions and reference material your AI agent loads on demand.
 > **What it isn't:** a component library, a CSS framework, or a design system. It has **zero runtime dependencies** — it works on any stack.
+
+---
+
+## Install
+
+**OMP plugin** — one command:
+
+```bash
+omp plugin install github:DrB0rk/Borks-uiux-skill
+```
+
+**Standalone skill** (Claude Code, OMP, any skills-based host):
+
+```bash
+git clone --depth 1 https://github.com/DrB0rk/Borks-uiux-skill.git b0rks-uiux-source
+cp -R b0rks-uiux-source/skills/b0rks-uiux ~/.agents/skills/
+```
+
+Restart your agent. Confirm it loaded by asking it *"What does the b0rks-uiux skill do?"*
+
+<details>
+<summary><strong>Other ways to install</strong></summary>
+
+### From the Skillshare registry
+
+```bash
+omp skill install @<scope>/b0rks-uiux
+```
+
+> **Requires a Stencil account.** Run `omp` and use `/login → Stencil`, or set `STENCIL_API_KEY`.
+
+### With per-project memory enabled
+
+Adds the `b0x` MCP server, so the skill remembers what you rejected and preferred in each project:
+
+```bash
+./scripts/install-mcp.sh
+```
+
+</details>
+
+> Two install notes. The `github:` prefix on the plugin command is **required** — a bare `DrB0rk/Borks-uiux-skill` is rejected as an invalid package name. And do **not** clone the repo straight into a skills folder: `SKILL.md` lives at `skills/b0rks-uiux/`, so copying the repo root leaves it undiscovered. Full detail below, under [Install in detail](#install-in-detail).
 
 ---
 
@@ -150,7 +192,7 @@ The layout is [progressive disclosure](https://en.wikipedia.org/wiki/Progressive
 
 ---
 
-## Install
+## Install in detail
 
 ### As an OMP plugin (recommended for OMP)
 
@@ -173,7 +215,7 @@ Verify it registered:
 
 ```bash
 omp plugin list
-# ● b0rks-uiux-skill@0.3.0
+# ● b0rks-uiux-skill@0.4.0
 ```
 
 Restart OMP after installation. The skill is then available as `b0rks-uiux`. Hosts bundling older copies must migrate explicitly — `b0rks-uiux` is a new identifier, not a backward-compatible alias for `bizar-uiux`.
