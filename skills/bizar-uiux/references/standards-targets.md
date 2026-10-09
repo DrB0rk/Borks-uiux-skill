@@ -16,9 +16,11 @@ Do not turn every threshold into a compliance audit. Apply the ones relevant to 
 
 **Target WCAG 2.2 Level AA** for web work, even where a legal baseline still references an older harmonised version. WCAG conformance is a floor, not a complete usability standard: a page can pass automated checks and still be confusing or exhausting to use. Pair conformance with cognitive review and manual assistive-technology testing of critical journeys.
 
-WCAG 2.2 added criteria directly relevant to everyday interface work: Focus Not Obscured, Focus Appearance, Dragging Movements, Target Size (Minimum), Consistent Help, Redundant Entry, and Accessible Authentication.
+WCAG 2.2 added criteria directly relevant to everyday interface work: Focus Not Obscured, Dragging Movements, Target Size (Minimum), Consistent Help, Redundant Entry, and Accessible Authentication.
 
-### Verified thresholds
+#Focus Appearance (SC 2.4.13) is **Level AAA**, not part of the Level AA baseline. Its design guidance is useful as a stretch goal, but must not be cited as mandatory for AA. See [research-addendum-2026.md](research-addendum-2026.md).
+
+## Verified thresholds
 
 | Area | Target | Source |
 |---|---|---|

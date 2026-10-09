@@ -4,7 +4,7 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-6EA8FF?style=flat-square"></a>
-  <img alt="Skill files" src="https://img.shields.io/badge/skill-5%20files-8F7CFF?style=flat-square">
+  <img alt="Skill files" src="https://img.shields.io/badge/skill-12%20files-8F7CFF?style=flat-square">
   <img alt="No runtime dependencies" src="https://img.shields.io/badge/dependencies-none-3FB950?style=flat-square">
 </p>
 
@@ -68,14 +68,35 @@ It is also explicit about what *must never* be used as an accusation: a common f
 
 ---
 
+## Expanded 2026 edition
+
+The skill now includes **six additional, selectively loaded playbooks** for autonomous frontend agents: end-to-end agent delivery, component interactions and keyboard patterns, semantic design tokens/responsive composition, real verification, honest content and ethical decision flows, and a sourced research addendum.
+
+Highlights:
+
+- **Intent contract + state model:** make flows, permissions, errors, saving and recovery explicit before implementation.
+- **Component contracts:** native control selection and WAI-ARIA keyboard patterns for dialogs, tabs, comboboxes, menus, trees and grids.
+- **Production design system:** token layers, theme/contrast, intrinsic responsiveness, locale resilience and domain-specific visual language.
+- **Coding-agent experience:** integrated composer with model/effort/permission controls, background-job state, approval and session identity.
+- **Verification:** automated accessibility checks, keyboard and assistive-tech testing, responsive/reflow checks, performance field-vs-lab distinction and transparent reporting.
+- **Content and trust:** cognitive accessibility, non-deceptive consent, helpful errors, persistent data and truthful claims.
+
+This remains a documentation-first skill, not a UI component framework. Treat the added acceptance and test examples as templates; they do not attest that a particular consumer application was tested.
+
 ## What's inside
 
 ```
 skills/bizar-uiux/
 ├── SKILL.md                      # Entry point: operating model, priorities, output format
 ├── references/
+│   ├── agent-workflow.md         # Task model, implementation and verification process
+│   ├── interaction-patterns.md  # Keyboard, focus, forms and coding-agent chat
+│   ├── design-systems.md        # Tokens, themes, responsive and locale support
+│   ├── evaluation-playbook.md   # QA matrix, automated and manual checks
+│   ├── content-trust-ethics.md  # Honest content, cognitive access and consent
+│   ├── research-addendum-2026.md # Additional primary-source guidance
 │   ├── principles.md             # 40 principles mapped to concrete design guidance
-│   ├── review-checklist.md       # 15-section audit checklist
+│   ├── review-checklist.md       # 16-section audit checklist
 │   ├── standards-targets.md      # Verified WCAG / performance thresholds
 │   ├── ai-assisted-ui.md         # Homogenisation signals, de-genericisation, risk rubric
 │   └── sources.md                # Provenance and per-source verification status
@@ -244,7 +265,7 @@ Each principle includes what it is, **when to use it**, and — importantly — 
 
 ---
 
-## The 15-section review checklist
+## The 16-section review checklist
 
 Used for audits and final implementation review:
 
@@ -258,6 +279,8 @@ Used for audits and final implementation review:
 | 6 | Visual hierarchy | 14 | Implementation quality |
 | 7 | Consistency & familiarity | 15 | Generic-default review |
 | 8 | Accessibility | | |
+
+16. **Agent delivery and state completeness** — inspect before rewriting, specify state contracts, verify actual behavior, and report what was not tested.
 
 Only relevant sections are applied — the skill does not force findings into categories that don't apply to your product.
 
