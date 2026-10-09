@@ -35,6 +35,16 @@ const server = new McpServer(
 
 const asText = (v) => ({ content: [{ type: "text", text: typeof v === "string" ? v : JSON.stringify(v, null, 2) }] });
 
+// When the project is unwritable (read-only checkout, permissions), memory is
+// simply unavailable. Say so plainly so the agent proceeds without it instead
+// of treating the failure as a design problem.
+const UNAVAILABLE =
+  "# Project design memory unavailable\n\n" +
+  "The `.b0x` folder could not be created or read for this project (unwritable directory). " +
+  "Continue the design work normally - memory is an enhancement, not a prerequisite. " +
+  "Do not retry the b0x tools for this session.";
+const notAvailable = ({ reason }) => reason === "disabled" ? null : UNAVAILABLE;
+
 server.registerTool(
   "b0x_status",
   {
@@ -78,7 +88,9 @@ server.registerTool(
   },
   async ({ kind, text, tags, source }) => {
     try {
-      const { root } = autoInit();
+      const proj = autoInit();
+      if (proj.available === false) return asText(notAvailable(proj) ?? "");
+      const { root } = proj;
       ensure(root);
       const entry = normalise({ kind, text, tags, source });
       const entries = [...load(root), entry];
@@ -109,7 +121,9 @@ server.registerTool(
     },
   },
   async ({ kind, limit = 50 }) => {
-    const { root } = autoInit();
+    const proj = autoInit();
+    if (proj.available === false) return asText(notAvailable(proj) ?? "");
+    const { root } = proj;
     const entries = load(root).filter((e) => !kind || e.kind === kind);
     return asText({
       projectRoot: root,
@@ -127,7 +141,9 @@ server.registerTool(
     inputSchema: { id: z.string().uuid().describe("Entry id returned by b0x_record or b0x_list") },
   },
   async ({ id }) => {
-    const { root } = autoInit();
+    const proj = autoInit();
+    if (proj.available === false) return asText(notAvailable(proj) ?? "");
+    const { root } = proj;
     const entries = load(root);
     const next = entries.filter((e) => e.id !== id);
     if (next.length === entries.length) return asText({ ok: false, error: `No entry with id ${id}` });
@@ -147,7 +163,9 @@ server.registerTool(
     inputSchema: {},
   },
   async () => {
-    const { root } = autoInit();
+    const proj = autoInit();
+    if (proj.available === false) return asText(notAvailable(proj) ?? "");
+    const { root } = proj;
     if (!isInitialised(root)) {
       return asText(
         "# Project design memory\n\n_No .b0x memory for this project yet._\n\nCall `b0x_record` when the user gives durable design feedback."

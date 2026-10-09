@@ -146,7 +146,7 @@ scripts/                          # validate.sh, install-mcp.sh
 package.json                      # OMP plugin + npm package manifest
 ```
 
-The layout is [progressive disclosure](https://en.wikipedia.org/wiki/Progressive_disclosure): only `SKILL.md` loads when the skill triggers, and the reference files load only when the specific task needs them. Roughly **116 tokens** of frontmatter description sit in context at all times; a triggered load pulls in ~2.0k more, and the references add more only when a task actually needs them.
+The layout is [progressive disclosure](https://en.wikipedia.org/wiki/Progressive_disclosure): only `SKILL.md` loads when the skill triggers, and the reference files load only when the specific task needs them. Roughly **120 tokens** of frontmatter description sit in context at all times; a triggered load pulls in ~3.2k more, and the references add more only when a task actually needs them.
 
 ---
 

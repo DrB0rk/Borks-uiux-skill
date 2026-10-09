@@ -81,6 +81,10 @@ export function ensure(root) {
       ) + "\n"
     );
   }
+  // Create the store up front too, so a freshly initialised folder is
+  // self-describing rather than looking half-built until the first record.
+  const entriesFile = path.join(dir, "entries.json");
+  if (!fs.existsSync(entriesFile)) writeAtomic(entriesFile, "[]\n");
   return dir;
 }
 
@@ -93,14 +97,26 @@ export function ensure(root) {
  */
 export function autoInit(start = process.cwd()) {
   if (process.env.B0X_AUTOINIT === "0") {
-    return { ...findProject(start), created: false, reason: "disabled" };
+    return { ...findProject(start), created: false, reason: "disabled", available: false };
   }
-  const { root, real } = findProject(start);
-  if (!real) return { root, real, created: false, reason: "not a project root" };
-  const existed = isInitialised(root);
-  ensure(root);
-  if (!fs.existsSync(path.join(b0xDir(root), "context.md"))) renderContext(root, load(root));
-  return { root, real, created: !existed };
+  let found;
+  try {
+    found = findProject(start);
+  } catch (err) {
+    return { root: path.resolve(start), real: false, created: false, available: false, reason: String(err?.code ?? err) };
+  }
+  if (!found.real) return { ...found, created: false, available: false, reason: "not a project root" };
+  try {
+    const existed = isInitialised(found.root);
+    ensure(found.root);
+    if (!fs.existsSync(path.join(b0xDir(found.root), "context.md"))) renderContext(found.root, load(found.root));
+    return { ...found, created: !existed, available: true };
+  } catch (err) {
+    // Read-only or unwritable project. Memory is an enhancement, never a
+    // prerequisite: report it and let the caller carry on without memory
+    // rather than failing the whole tool call.
+    return { ...found, created: false, available: false, reason: String(err?.code ?? err) };
+  }
 }
 
 export function isInitialised(root) {
@@ -136,18 +152,28 @@ export function normalise({ kind, text, tags, source }) {
 
   let t = String(text ?? "").trim();
   if (!t) errors.push("text is required");
-  // Clamp silently as defence in depth. The MCP input schema already rejects
-  // oversized text before this runs; throwing here as well would make the
-  // clamp unreachable.
-  else if (t.length > MAX_TEXT) t = t.slice(0, MAX_TEXT);
+  // Strip C0/C1 control characters. Entries are rendered into terminals and
+  // diffs, so an embedded ESC (0x1b) could repaint or reposition the display.
+  // Newline, carriage return and tab are kept because they carry meaning.
+  else t = t.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]/g, "");
+  if (t.length > MAX_TEXT) t = t.slice(0, MAX_TEXT);
 
   let cleanTags = [];
   if (tags != null) {
     if (!Array.isArray(tags)) errors.push("tags must be an array of strings");
     else {
       cleanTags = tags
-        .map((x) => String(x).trim().toLowerCase())
-        .filter((x) => x && x.length <= 40)
+        .map((x) =>
+          String(x)
+            // Same control-character strip as text, for the same reason.
+            .replace(/[\u0000-\u001F\u007F-\u009F]/g, "")
+            .trim()
+            .toLowerCase()
+        )
+        // Truncate rather than drop: a long tag is still useful signal, and
+        // silently discarding it would look like the tag was never stored.
+        .map((x) => (x.length > 40 ? x.slice(0, 40) : x))
+        .filter(Boolean)
         .slice(0, MAX_TAGS);
     }
   }
