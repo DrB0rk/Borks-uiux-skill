@@ -1,9 +1,9 @@
 ---
-name: bizar-uiux
+name: b0rks-uiux
 description: Research, design, implement, audit, and validate UI/UX in web, mobile, and developer tools. Use for frontend coding, interface design, redesigns, responsive layouts, design systems and tokens, component interactions, agent/chat interfaces, forms, accessibility, content design, keyboard usability, interaction state modeling, performance, and AI-generated UI quality review. Produce evidence-backed fixes, complete states, and practical verification rather than generic visual polish.
 ---
 
-# Bizar UI/UX
+# B0rk's UI/UX SKILL
 
 Use this skill to turn interface work into explicit, testable design decisions instead of taste-driven styling. Apply the smallest relevant subset of principles; do not force every law into every screen.
 

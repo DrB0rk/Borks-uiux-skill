@@ -1,7 +1,7 @@
 {
-  "name": "bizar-uiux-skill",
-  "version": "0.2.0",
-  "description": "Research-backed UI/UX engineering skill for coding agents: intent, interaction patterns, design systems, WCAG 2.2, verification and authentic product UI.",
+  "name": "b0rks-uiux-skill",
+  "version": "0.3.0",
+  "description": "B0rk's UI/UX SKILL: evidence-based UI/UX engineering, design systems, accessibility, validation and agent workflows.",
   "license": "MIT",
   "type": "module",
   "keywords": [
@@ -12,7 +12,9 @@
     "ux-design",
     "accessibility",
     "design-system",
-    "ai-skills"
+    "ai-skills",
+    "b0rk",
+    "ui-ux"
   ],
   "files": [
     "skills/",

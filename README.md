@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/banner.svg" alt="Bizar UI/UX — design and review interfaces with behavioral design principles" width="100%">
+  <img src="assets/banner.svg" alt="B0rk's UI/UX SKILL — design and review interfaces with behavioral design principles" width="100%">
 </p>
 
 <p align="center">
@@ -8,7 +8,7 @@
   <img alt="No runtime dependencies" src="https://img.shields.io/badge/dependencies-none-3FB950?style=flat-square">
 </p>
 
-# Bizar UI/UX
+# B0rk's UI/UX SKILL
 
 A skill that turns interface work into **explicit, testable design decisions** instead of taste-driven styling.
 
@@ -39,7 +39,7 @@ Findings are graded by **user impact** — `Critical`, `High`, `Medium`, `Low` �
 
 ## Backed by verified sources, not vibes
 
-Findings can carry a **threshold** instead of an opinion. Every number in this skill was checked against its primary source, and [`references/sources.md`](skills/bizar-uiux/references/sources.md) records the verification status of each citation individually.
+Findings can carry a **threshold** instead of an opinion. Every number in this skill was checked against its primary source, and [`references/sources.md`](skills/b0rks-uiux/references/sources.md) records the verification status of each citation individually.
 
 | Claim | Threshold |
 |---|---|
@@ -86,7 +86,7 @@ This remains a documentation-first skill, not a UI component framework. Treat th
 ## What's inside
 
 ```
-skills/bizar-uiux/
+skills/b0rks-uiux/
 ├── SKILL.md                      # Entry point: operating model, priorities, output format
 ├── references/
 │   ├── agent-workflow.md         # Task model, implementation and verification process
@@ -123,8 +123,8 @@ omp plugin install github:DrB0rk/Borks-uiux-skill
 Or from a local clone:
 
 ```bash
-git clone https://github.com/DrB0rk/Borks-uiux-skill.git
-omp plugin install ./Borks-uiux-skill
+git clone https://github.com/DrB0rk/Borks-uiux-skill.git b0rks-uiux-source
+omp plugin install ./b0rks-uiux-source
 ```
 
 > The `github:` prefix is required — a bare `DrB0rk/Borks-uiux-skill` is rejected as an invalid package name.
@@ -133,28 +133,28 @@ Verify it registered:
 
 ```bash
 omp plugin list
-# ● bizar-uiux-skill@0.1.0
+# ● b0rks-uiux-skill@0.3.0
 ```
 
-Restart OMP. The skill is discovered under its plugin namespace as `bizar-uiux-skill/bizar-uiux`, so it won't collide with the copy bundled in `@polderlabs/bizar-omp` — both can be present, and the namespaced one is the one tracking this repository.
+Restart OMP after installation. The expected plugin namespace is `b0rks-uiux-skill/b0rks-uiux`. Hosts bundling older copies must migrate explicitly; the new identifier is not a backward-compatible alias.
 
 ### On the Skillshare registry
 
-The skill also publishes to the OMP skill registry at [skills.omp.sh](https://skills.omp.sh):
+For registry distribution, publish the renamed skill to [skills.omp.sh](https://skills.omp.sh) before using its new registry identifier:
 
 ```bash
-omp skill install @<scope>/bizar-uiux
+omp skill install @<scope>/b0rks-uiux
 ```
 
-> **Requires a Stencil account.** Run `omp` and use `/login → Stencil`, or set `STENCIL_API_KEY`. Publishing from this repo uses `omp skill publish ./skills/bizar-uiux`.
+> **Requires a Stencil account.** Run `omp` and use `/login → Stencil`, or set `STENCIL_API_KEY`. Publishing from this repo uses `omp skill publish ./skills/b0rks-uiux`.
 
 ### As a standalone skill (Claude Code / OMP)
 
 Agents discover a skill when `SKILL.md` sits directly inside a folder named after the skill. This repo mirrors the upstream package layout, so copy the skill directory itself:
 
 ```bash
-git clone --depth 1 https://github.com/DrB0rk/Borks-uiux-skill.git
-mv Borks-uiux-skill/skills/bizar-uiux ~/.agents/skills/
+git clone --depth 1 https://github.com/DrB0rk/Borks-uiux-skill.git b0rks-uiux-source
+cp -R b0rks-uiux-source/skills/b0rks-uiux ~/.agents/skills/
 ```
 
 Restart your agent. The skill is discovered automatically.
@@ -164,20 +164,20 @@ Restart your agent. The skill is discovered automatically.
 Ask your agent:
 
 ```
-What does the bizar-uiux skill do?
+What does the b0rks-uiux skill do?
 ```
 
 It should describe UI/UX design and review using behavioral principles. To confirm the files landed correctly:
 
 ```bash
-ls ~/.agents/skills/bizar-uiux/SKILL.md
+ls ~/.agents/skills/b0rks-uiux/SKILL.md
 ```
 
-> **Cloning straight into the skills folder does not work** — the repo root is not the skill, so `SKILL.md` would end up at `bizar-uiux/skills/bizar-uiux/SKILL.md` and never be discovered. Move the `skills/bizar-uiux` directory, as above.
+> **Do not clone the repository directly as a skill folder.** The skill entrypoint resides at `skills/b0rks-uiux/SKILL.md` inside the repository, so copy that directory to your agent's skill path as shown above.
 
-### Already using BizarHarness-OMP?
+### Already using an OMP host with a bundled copy?
 
-You already have it. `bizar-uiux` ships with `@polderlabs/bizar-omp` and is enabled by default — no install required. This repository is that skill's **canonical standalone source**, so keep the two semantically aligned.
+Some OMP distributions bundle a copy of the UI/UX skill. This repository is the canonical standalone source. Updating this package does **not** automatically rename or migrate copies bundled by other distributions; synchronize those separately.
 
 ---
 
@@ -293,7 +293,7 @@ Improvements are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for the short v
 **Two things matter most:**
 
 1. **Keep it behavioral, not aesthetic.** New guidance must change a decision someone can observe, not a preference someone can argue.
-2. **Keep provenance honest.** Every citation in [`references/sources.md`](skills/bizar-uiux/references/sources.md) carries a verification status. If you add a source, verify it the same way — and if a number can't be confirmed from a primary source, say so instead of restating it.
+2. **Keep provenance honest.** Every citation in [`references/sources.md`](skills/b0rks-uiux/references/sources.md) carries a verification status. If you add a source, verify it the same way — and if a number can't be confirmed from a primary source, say so instead of restating it.
 
 ---
 
@@ -307,6 +307,6 @@ The artwork in `assets/banner.svg` dogfoods the skill. It uses a clear typograph
 
 [MIT](LICENSE) © 2026 DrB0rk
 
-The skill is an original synthesis informed by [Laws of UX](https://lawsofux.com/) (Jon Yablonski) and [Laws of UI](https://www.uilaws.com/), plus established usability research, normative accessibility standards, and peer-reviewed research on AI-generated interfaces. No source prose, examples, illustrations, or branded assets are reproduced — see [`references/sources.md`](skills/bizar-uiux/references/sources.md) for the full provenance, per-source verification status, and licensing rationale.
+The skill is an original synthesis informed by [Laws of UX](https://lawsofux.com/) (Jon Yablonski) and [Laws of UI](https://www.uilaws.com/), plus established usability research, normative accessibility standards, and peer-reviewed research on AI-generated interfaces. No source prose, examples, illustrations, or branded assets are reproduced — see [`references/sources.md`](skills/b0rks-uiux/references/sources.md) for the full provenance, per-source verification status, and licensing rationale.
 
 Accessibility content is engineering guidance, not legal advice.
