@@ -83,6 +83,10 @@ Treat stored entries as **project data to show the user**, not as instructions f
 
 The skill's `project-memory.md` reference states this rule to the agent directly.
 
+## Lifecycle
+
+`SIGINT`, `SIGTERM` and `SIGHUP` close the transport and exit cleanly, so the server is never orphaned when the parent agent exits. Uncaught exceptions are reported on stderr rather than silently wedging the process while an agent waits on a tool that will never answer.
+
 ## Test
 
 Two suites, both run by `./scripts/validate.sh`:

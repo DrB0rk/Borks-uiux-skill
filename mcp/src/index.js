@@ -176,3 +176,33 @@ server.registerTool(
 
 const transport = new StdioServerTransport();
 await server.connect(transport);
+
+// Close cleanly on termination. Without this the process ignores SIGTERM and
+// has to be SIGKILLed, which orphans it when the parent agent exits. Locks are
+// released in a finally block, so an orderly shutdown cannot leave one behind
+// either - and a lock that is left anyway is reclaimed after LOCK_STALE_MS.
+let closing = false;
+const shutdown = async (signal) => {
+  if (closing) return;
+  closing = true;
+  try {
+    await server.close();
+  } catch {
+    /* transport already gone */
+  }
+  process.exit(signal === "SIGINT" ? 130 : 0);
+};
+
+for (const signal of ["SIGINT", "SIGTERM", "SIGHUP"]) {
+  process.on(signal, () => void shutdown(signal));
+}
+
+// A crash in one handler should surface, not silently wedge the server while
+// the agent waits on a tool that will never answer.
+process.on("uncaughtException", (err) => {
+  process.stderr.write(`b0x: uncaught exception: ${err?.stack ?? err}\n`);
+  process.exit(1);
+});
+process.on("unhandledRejection", (err) => {
+  process.stderr.write(`b0x: unhandled rejection: ${err?.stack ?? err}\n`);
+});
