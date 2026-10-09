@@ -337,7 +337,7 @@ export function appendLog(root, event) {
   fs.appendFileSync(file, line, "utf8");
 }
 
-export function normalise({ kind, text, tags, source }) {
+export function normalise({ kind, text, tags, source, reinforcements = 1, lastReinforced }) {
   const errors = [];
   const k = String(kind ?? "").trim().toLowerCase();
   if (!KINDS.includes(k)) errors.push(`kind must be one of: ${KINDS.join(", ")}`);
@@ -372,16 +372,225 @@ export function normalise({ kind, text, tags, source }) {
 
   if (errors.length) throw new Error(errors.join("; "));
 
+  const now = new Date().toISOString();
   return {
     id: crypto.randomUUID(),
     kind: k,
     text: t,
     tags: cleanTags,
     source: String(source ?? "agent").slice(0, 120),
-    created: new Date().toISOString(),
+    reinforcements: Math.max(1, parseInt(reinforcements, 10) || 1),
+    lastReinforced: lastReinforced || now,
+    created: now,
   };
 }
 
+const DOMAIN_KEYWORDS = [
+  "padding", "margin", "spacing", "gap",
+  "radius", "border-radius", "rounded",
+  "border", "rail", "divider", "outline",
+  "contrast", "color", "colour", "background", "accent",
+  "font", "typography", "heading", "weight",
+  "icon", "svg", "lucide",
+  "animation", "motion", "transition", "spring", "gsap",
+  "card", "table", "button", "modal", "dialog", "popover",
+  "form", "input", "label",
+  "copy", "marketing", "filler",
+];
+
+export function extractDomainTags(text) {
+  const lower = String(text || "").toLowerCase();
+  const matched = [];
+  for (const kw of DOMAIN_KEYWORDS) {
+    if (lower.includes(kw)) {
+      matched.push(kw === "colour" ? "color" : kw === "rounded" ? "radius" : kw);
+    }
+  }
+  return Array.from(new Set(matched)).slice(0, MAX_TAGS);
+}
+
+function textWords(text) {
+  return new Set(
+    String(text || "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, " ")
+      .split(/\s+/)
+      .filter((w) => w.length >= 3)
+  );
+}
+
+function jaccard(setA, setB) {
+  if (!setA.size || !setB.size) return 0;
+  let intersection = 0;
+  for (const item of setA) {
+    if (setB.has(item)) intersection++;
+  }
+  const union = setA.size + setB.size - intersection;
+  return union === 0 ? 0 : intersection / union;
+}
+
+export function findDuplicate(entries, newEntry) {
+  const newW = textWords(newEntry.text);
+  for (const existing of entries) {
+    if (existing.kind !== newEntry.kind) continue;
+    if (existing.text.trim().toLowerCase() === newEntry.text.trim().toLowerCase()) {
+      return existing;
+    }
+    const existingW = textWords(existing.text);
+    if (jaccard(newW, existingW) >= 0.75) {
+      return existing;
+    }
+  }
+  return null;
+}
+
+export function findConflicts(entries, newEntry) {
+  const newDomains = new Set(newEntry.tags?.length ? newEntry.tags : extractDomainTags(newEntry.text));
+  if (!newDomains.size) return [];
+
+  const conflicts = [];
+  const newW = textWords(newEntry.text);
+
+  for (const existing of entries) {
+    const existingDomains = new Set(existing.tags?.length ? existing.tags : extractDomainTags(existing.text));
+    const shared = Array.from(newDomains).filter((d) => existingDomains.has(d));
+    if (!shared.length) continue;
+
+    const isPolarityConflict =
+      (existing.kind === "rejection" && newEntry.kind === "preference") ||
+      (existing.kind === "preference" && newEntry.kind === "rejection");
+
+    const similarity = jaccard(newW, textWords(existing.text));
+
+    if (isPolarityConflict && (similarity >= 0.25 || shared.length >= 2)) {
+      conflicts.push(existing);
+    } else if (existing.kind === newEntry.kind && similarity >= 0.5 && existing.text !== newEntry.text) {
+      conflicts.push(existing);
+    }
+  }
+  return conflicts;
+}
+
+/**
+ * Distill natural-language user feedback into structured directive, kind, and tags.
+ */
+export function distillFeedback(rawFeedback, contextHint = "") {
+  if (!rawFeedback || typeof rawFeedback !== "string") {
+    throw new Error("rawFeedback must be a non-empty string.");
+  }
+
+  const text = rawFeedback.trim();
+  const lower = text.toLowerCase();
+
+  let kind = "preference";
+  const rejectionPatterns = [
+    /\b(never|don't|dont|do not|stop|avoid|hate|dislike|remove|no more|terrible|awful)\b/i,
+    /\bnot (good|working|acceptable)\b/i,
+    /\b(get rid of|drop the)\b/i,
+    /\btoo (much|loud|bright|flashy|cluttered|dense|big|small)\b/i,
+  ];
+  const praisePatterns = [
+    /\b(great|love|perfect|keep|excellent|works well|approved|good job|nice|looks good)\b/i,
+    /\b(exactly right|nailed it)\b/i,
+  ];
+
+  if (rejectionPatterns.some((p) => p.test(lower))) {
+    kind = "rejection";
+  } else if (praisePatterns.some((p) => p.test(lower))) {
+    kind = "praise";
+  }
+
+  let cleaned = text
+    .replace(/^(hey|hi|hello|please|can you|could you|i want you to|make sure to|i think|actually|honestly|just|nah|no)[,\s]+/gi, "")
+    .replace(/[.!?]+$/, "")
+    .trim();
+
+  let directive = cleaned;
+  if (kind === "rejection") {
+    if (!/^(never|do not|avoid|no\b)/i.test(cleaned)) {
+      const rest = cleaned
+        .replace(/^(stop|don't|dont|get rid of)\s+/i, "")
+        .replace(/^(putting|using|doing)\b/i, (m) => (m.toLowerCase() === "putting" ? "put" : m.toLowerCase() === "using" ? "use" : "do"));
+      directive = `Never ${rest}`;
+    }
+  } else if (kind === "praise") {
+    directive = cleaned;
+  } else if (kind === "preference") {
+    if (/^(i prefer|we prefer|prefer|always|use)\s+/i.test(cleaned)) {
+      directive = cleaned.replace(/^(i prefer|we prefer)\s+/i, "Prefer ");
+    } else {
+      directive = `Prefer ${cleaned}`;
+    }
+  }
+
+  const tags = extractDomainTags(`${directive} ${contextHint}`);
+
+  return {
+    kind,
+    directive: directive.slice(0, MAX_TEXT),
+    raw: text,
+    tags,
+    confidence: "high",
+  };
+}
+
+/**
+ * Smart append that auto-deduplicates (increments reinforcement) and resolves conflicts.
+ */
+export function learnEntry(root, entry, { autoSupersede = true } = {}) {
+  return withLock(root, () => {
+    ensure(root);
+    const entries = load(root);
+
+    // 1. Check for duplicate or near-duplicate -> reinforce
+    const existingDup = findDuplicate(entries, entry);
+    if (existingDup) {
+      existingDup.reinforcements = (existingDup.reinforcements || 1) + 1;
+      existingDup.lastReinforced = new Date().toISOString();
+      if (entry.tags?.length) {
+        existingDup.tags = Array.from(new Set([...(existingDup.tags || []), ...entry.tags])).slice(0, MAX_TAGS);
+      }
+      save(root, entries);
+      appendLog(root, { action: "reinforce", id: existingDup.id, count: existingDup.reinforcements });
+      const context = renderContext(root, entries);
+      return {
+        action: "reinforced",
+        entry: existingDup,
+        reinforcements: existingDup.reinforcements,
+        total: entries.length,
+        context,
+      };
+    }
+
+    // 2. Check for conflicts -> supersede
+    const conflicts = findConflicts(entries, entry);
+    let superseded = [];
+    let nextEntries = entries;
+
+    if (conflicts.length > 0 && autoSupersede) {
+      const conflictIds = new Set(conflicts.map((c) => c.id));
+      superseded = conflicts;
+      nextEntries = entries.filter((e) => !conflictIds.has(e.id));
+      for (const c of conflicts) {
+        appendLog(root, { action: "supersede", id: c.id, supersededBy: entry.id });
+      }
+    }
+
+    // 3. Save new entry
+    const report = save(root, [...nextEntries, entry]);
+    appendLog(root, { action: "learn", id: entry.id, kind: entry.kind });
+    const context = renderContext(root, report.kept);
+    return {
+      action: superseded.length > 0 ? "superseded" : "added",
+      entry,
+      superseded: superseded.map((s) => ({ id: s.id, text: s.text })),
+      conflicts: conflicts.map((c) => ({ id: c.id, text: c.text })),
+      total: report.kept.length,
+      ...report,
+      context,
+    };
+  });
+}
 /** Regenerate context.md - the compact snapshot the agent actually follows. */
 export function renderContext(root, entries = [], roleId = null) {
   const baseline = getGlobalBaseline();
@@ -476,7 +685,8 @@ export function renderContext(root, entries = [], roleId = null) {
       lines.push("");
       for (const e of projRejections) {
         const tags = e.tags?.length ? ` _(tags: ${e.tags.join(", ")})_` : "";
-        lines.push(`- ${e.text}${tags}`);
+        const rf = e.reinforcements > 1 ? ` _(reinforced ×${e.reinforcements})_` : "";
+        lines.push(`- ${e.text}${tags}${rf}`);
       }
       lines.push("");
     }
@@ -485,7 +695,8 @@ export function renderContext(root, entries = [], roleId = null) {
       lines.push("");
       for (const e of projPreferences) {
         const tags = e.tags?.length ? ` _(tags: ${e.tags.join(", ")})_` : "";
-        lines.push(`- ${e.text}${tags}`);
+        const rf = e.reinforcements > 1 ? ` _(reinforced ×${e.reinforcements})_` : "";
+        lines.push(`- ${e.text}${tags}${rf}`);
       }
       lines.push("");
     }
@@ -494,9 +705,9 @@ export function renderContext(root, entries = [], roleId = null) {
       lines.push("");
       for (const e of projPraise) {
         const tags = e.tags?.length ? ` _(tags: ${e.tags.join(", ")})_` : "";
-        lines.push(`- ${e.text}${tags}`);
+        const rf = e.reinforcements > 1 ? ` _(reinforced ×${e.reinforcements})_` : "";
+        lines.push(`- ${e.text}${tags}${rf}`);
       }
-      lines.push("");
     }
   }
 

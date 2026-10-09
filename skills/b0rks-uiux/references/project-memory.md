@@ -41,15 +41,21 @@ Shipped in the b0x repository and loaded automatically on every project visit:
 ## The workflow loop
 
 ```
-user gives durable feedback
+user gives natural feedback or corrections
         ↓
-you record it        b0x_record(kind=rejection|preference|praise, scope=project|global)
+agent calls b0x_learn({ feedback, context? })
         ↓
-next session         b0x_context({ role?: '...' }) → reads global baseline + project memory
+b0x engine automatically:
+  • distills a clean imperative directive
+  • classifies kind (rejection / preference / praise)
+  • extracts domain tags
+  • detects conflicts and auto-supersedes stale rules
+  • reinforces repeated preferences (tracks reinforcement count)
         ↓
-you apply it         rejections are binding, preferences are defaults
+next session / turn: b0x_context({ role?: '...' })
+  → reads global baseline + project memory with reinforcement counts
         ↓
-user corrects you    supersede the old entry, record the new one
+agent applies rules automatically (rejections = binding, preferences = defaults)
 ```
 
 ## Before doing UI/UX work in a project
@@ -106,9 +112,15 @@ Never leave two entries that contradict each other.
 | `b0x_roles` | Inspect or list global roles (`ui-engineer`, `ui-auditor`, `content-designer`, `motion-specialist`, `accessibility-specialist`) |
 | `b0x_status` | Status of global repository baseline, user global, and local project memory |
 | `b0x_context` | Read unified memory before designing. Supports optional `{ role: '...' }` spotlight. **Call this first.** |
-| `b0x_record` | Store durable feedback (`scope: "project"` or `scope: "global"`) |
+| `b0x_learn` | **Automated learning engine:** parse conversational user feedback, distill clean directives, auto-supersede conflicting rules, reinforce duplicates |
+| `b0x_learn_from_audit` | Permanently record a verified diagnostic audit fix as a project preference |
+| `b0x_record` | Manual fallback to store durable feedback (`scope: "project"` or `scope: "global"`) |
 | `b0x_list` | Inspect entries, with `kind` and `scope` filters |
 | `b0x_forget` | Remove or supersede an entry by id |
+| `b0x_check_contrast` | Audit color contrast against WCAG 2.2 AA/AAA (text 4.5:1, components 3:1) with passing color suggestions |
+| `b0x_check_target` | Validate pointer/touch targets against WCAG 2.5.8 (24×24), Apple HIG (44×44), Android (48×48) |
+| `b0x_check_html` | Static audit of HTML/JSX for unlabeled inputs, unnamed icon buttons, clickable divs, layout animation |
+| `b0x_check_tokens` | Validate Design Tokens against DTCG 2025.10 and detect raw hex leaks |
 
 ## Trust boundary
 

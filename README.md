@@ -237,7 +237,7 @@ Verify it registered:
 
 ```bash
 omp plugin list
-# ● b0rks-uiux-skill@0.8.0
+# ● b0rks-uiux-skill@0.9.0
 ```
 
 Restart OMP after installation. The skill is then available as `b0rks-uiux`. Hosts bundling older copies must migrate explicitly — `b0rks-uiux` is a new identifier, not a backward-compatible alias for `bizar-uiux`.
@@ -338,6 +338,13 @@ Run checks directly in the shell or CI:
 ./scripts/audit-ui.js --html '<form><input type="text"><button><svg/></button></form>'
 ./scripts/audit-ui.js --file src/components/NavBar.tsx
 ```
+
+### Automated self-learning engine
+
+Memory doesn't require manual bookkeeping:
+- **`b0x_learn`**: Call with raw user feedback (`b0x_learn({ feedback: "don't use 24px padding on cards" })`). The engine automatically distills a clean imperative directive, classifies kind (`rejection`, `preference`, `praise`), extracts domain tags, auto-supersedes contradictory earlier rules, and increments reinforcement counters on repeated preferences.
+- **`b0x_learn_from_audit`**: Converts verified diagnostic audit fixes (`b0x_check_*`) into permanent project preferences so defects are never repeated.
+
 ---
 
 ## Design priorities

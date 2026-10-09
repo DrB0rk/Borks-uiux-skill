@@ -237,5 +237,49 @@ console.log("=== context.md is never stale ===");
   fs.rmSync(root, { recursive: true, force: true });
 }
 
+console.log("=== distillFeedback: natural language to clean directive ===");
+{
+  const r1 = S.distillFeedback("Nah, stop putting large borders around cards", "card component");
+  check("distill rejection detects kind", r1.kind === "rejection");
+  check("distill rejection formats directive", r1.directive === "Never put large borders around cards");
+  check("distill rejection extracts tags", r1.tags.includes("border") && r1.tags.includes("card"));
+
+  const r2 = S.distillFeedback("The compact settings list looks great, keep it", "settings");
+  check("distill praise detects kind", r2.kind === "praise");
+
+  const r3 = S.distillFeedback("Actually, we prefer 24px padding on cards for touch comfort", "card");
+  check("distill preference detects kind", r3.kind === "preference");
+  check("distill preference formats directive", r3.directive === "Prefer 24px padding on cards for touch comfort");
+  check("distill preference extracts tags", r3.tags.includes("padding") && r3.tags.includes("card"));
+}
+
+console.log("=== learnEntry: auto-deduplication, reinforcement, and conflict supersession ===");
+{
+  const root = freshProject("learn");
+  S.autoInit(root);
+
+  const e1 = S.normalise({ kind: "rejection", text: "Never use 24px padding on cards", tags: ["padding", "card"] });
+  const a1 = S.learnEntry(root, e1);
+  check("first entry added", a1.action === "added");
+  check("reinforcements starts at 1", a1.entry.reinforcements === 1);
+
+  // Duplicate reinforcement
+  const a2 = S.learnEntry(root, S.normalise({ kind: "rejection", text: "Never use 24px padding on cards", tags: ["padding", "card"] }));
+  check("duplicate call reinforces", a2.action === "reinforced");
+  check("reinforcements increments to 2", a2.reinforcements === 2);
+  check("total entries remains 1", a2.total === 1);
+
+  // Conflicting preference supersedes earlier rejection
+  const eConf = S.normalise({ kind: "preference", text: "Prefer 24px padding on cards for touch comfort", tags: ["padding", "card"] });
+  const a3 = S.learnEntry(root, eConf);
+  check("conflicting entry supersedes", a3.action === "superseded");
+  check("superseded list contains old rule", a3.superseded.some((s) => s.id === e1.id));
+  const currentEntries = S.load(root);
+  check("only 1 active entry remains", currentEntries.length === 1);
+  check("new preference is active", currentEntries[0].text === eConf.text);
+
+  fs.rmSync(root, { recursive: true, force: true });
+}
+
 console.log(failures === 0 ? "\nAll store tests passed." : `\n${failures} check(s) FAILED.`);
 process.exit(failures === 0 ? 0 : 1);

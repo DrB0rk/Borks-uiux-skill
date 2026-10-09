@@ -147,6 +147,28 @@ async function main() {
     },
   }));
   console.log("  catches legacy & component leaks:", tokenAudit.totalIssues >= 2, "| total tokens:", tokenAudit.totalTokens);
+
+  t("b0x_learn: automated feedback distillation");
+  const learnRes = JSON.parse(await call("b0x_learn", {
+    feedback: "Nah, don't use large borders around cards, it looks cluttered",
+    context: "card component",
+  }));
+  console.log("  action:", learnRes.action, "| distilled:", learnRes.distilled.directive, "| tags:", learnRes.distilled.tags);
+
+  t("b0x_learn: reinforcement of duplicate");
+  const learnDup = JSON.parse(await call("b0x_learn", {
+    feedback: "Don't use large borders around cards",
+    context: "card",
+  }));
+  console.log("  action:", learnDup.action, "| reinforcements:", learnDup.reinforcements);
+
+  t("b0x_learn_from_audit");
+  const auditLearn = JSON.parse(await call("b0x_learn_from_audit", {
+    auditType: "contrast",
+    issue: "failing text contrast on #94a3b8 on #ffffff",
+    fix: "use #66758a for normal text on white surfaces",
+  }));
+  console.log("  audit lesson recorded:", auditLearn.ok, "| rule:", auditLearn.rule);
   await client.close();
 }
 

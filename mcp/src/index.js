@@ -21,11 +21,14 @@ import {
   KINDS,
   append,
   autoInit,
+  distillFeedback,
+  findConflicts,
   getGlobalBaseline,
   getGlobalRoles,
   getRole,
   getUserGlobalDir,
   isInitialised,
+  learnEntry,
   load,
   loadMerged,
   loadUserGlobal,
@@ -251,6 +254,113 @@ server.registerTool(
     const remaining = remove(proj.root, id);
     if (remaining === null) return asText({ ok: false, error: `No entry with id ${id}` });
     return asText({ ok: true, removed: id, total: remaining });
+  }
+);
+
+server.registerTool(
+  "b0x_learn",
+  {
+    title: "Automatically distill and learn from user design feedback",
+    description:
+      "Automated learning engine: parses natural language user feedback or corrections (e.g. 'I don't like the button padding, make it 8px'), distills it into a clean directive, automatically detects kind (rejection/preference/praise) and domain tags, resolves conflicts by superseding outdated rules, or reinforces existing rules. Call this whenever the user gives feedback or corrects UI/UX choices.",
+    inputSchema: {
+      feedback: z.string().min(1).describe("Natural language user feedback or correction"),
+      context: z.string().optional().describe("Optional context hint about the screen or component (e.g. 'settings table', 'navigation bar')"),
+      scope: z.enum(["project", "global"]).optional().describe("Storage scope: 'project' (default, local .b0x/) or 'global' (saves in user global ~/.b0x/)"),
+      autoSupersede: z.boolean().optional().describe("Automatically supersede conflicting earlier rules (default true)"),
+    },
+  },
+  async ({ feedback, context = "", scope = "project", autoSupersede = true }) => {
+    try {
+      let targetRoot;
+      if (scope === "global") {
+        targetRoot = getUserGlobalDir();
+      } else {
+        const proj = autoInit();
+        if (proj.available === false) return asText(notAvailable(proj) ?? "");
+        targetRoot = proj.root;
+      }
+
+      const distilled = distillFeedback(feedback, context);
+      const entry = normalise({
+        kind: distilled.kind,
+        text: distilled.directive,
+        tags: distilled.tags,
+        source: "user feedback via b0x_learn",
+      });
+
+      const report = learnEntry(targetRoot, entry, { autoSupersede });
+
+      return asText({
+        ok: true,
+        action: report.action,
+        distilled: {
+          raw: feedback,
+          directive: entry.text,
+          kind: entry.kind,
+          tags: entry.tags,
+        },
+        reinforcements: report.reinforcements || 1,
+        superseded: report.superseded || [],
+        conflicts: report.conflicts || [],
+        scope,
+        totalActiveProjectRules: report.total,
+        message: `Learned: [${entry.kind}] ${entry.text}${
+          report.action === "superseded"
+            ? ` (superseded ${report.superseded.length} conflicting rule)`
+            : report.action === "reinforced"
+            ? ` (reinforced ×${report.reinforcements})`
+            : ""
+        }`,
+      });
+    } catch (err) {
+      return asText({ ok: false, error: String(err?.message ?? err) });
+    }
+  }
+);
+
+server.registerTool(
+  "b0x_learn_from_audit",
+  {
+    title: "Record durable lesson from diagnostic audit fix",
+    description:
+      "Convert a verified diagnostic fix (contrast adjustment, touch target padding, or HTML accessibility repair) into an active project preference so the defect is never repeated.",
+    inputSchema: {
+      auditType: z.enum(["contrast", "target", "html", "tokens"]).describe("The audit tool that detected the issue"),
+      issue: z.string().describe("Description of the detected issue (e.g. 'Failing text contrast on #94a3b8 on white')"),
+      fix: z.string().describe("The verified fix applied (e.g. 'Use #66758a for normal text on white')"),
+      scope: z.enum(["project", "global"]).optional(),
+    },
+  },
+  async ({ auditType, issue, fix, scope = "project" }) => {
+    try {
+      let targetRoot;
+      if (scope === "global") {
+        targetRoot = getUserGlobalDir();
+      } else {
+        const proj = autoInit();
+        if (proj.available === false) return asText(notAvailable(proj) ?? "");
+        targetRoot = proj.root;
+      }
+
+      const entry = normalise({
+        kind: "preference",
+        text: `Verified ${auditType} fix: ${fix.trim()}`,
+        tags: [auditType, "audit-fix"],
+        source: `diagnostic audit (${auditType})`,
+      });
+
+      const report = learnEntry(targetRoot, entry, { autoSupersede: true });
+      return asText({
+        ok: true,
+        action: report.action,
+        rule: entry.text,
+        remediedIssue: issue,
+        totalActiveProjectRules: report.total,
+      });
+    } catch (err) {
+      return asText({ ok: false, error: String(err?.message ?? err) });
+    }
   }
 );
 

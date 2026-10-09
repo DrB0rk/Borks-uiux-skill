@@ -2,7 +2,7 @@
 name: b0rks-uiux
 description: Research, design, implement, audit, and validate UI/UX in web, mobile, and developer tools. Use for frontend coding, interface design, redesigns, responsive layouts, design systems and tokens, component interactions, agent/chat interfaces, forms, accessibility, content design, keyboard usability, interaction state modeling, performance, and AI-generated UI quality review. Produce evidence-backed fixes, complete states, and practical verification rather than generic visual polish.
 metadata:
-  version: 0.8.0
+  version: 0.9.0
 ---
 
 # B0rk's UI/UX SKILL
@@ -24,18 +24,24 @@ Use this skill to turn interface work into explicit, testable design decisions i
    - Call `b0x_check_tokens` on design token dictionaries to validate DTCG 2025.10 compliance and prevent raw values leaking into component layers.
    - In shell/CI contexts, run `./scripts/audit-ui.js` (`--contrast`, `--target`, `--html`, `--file`, `--tokens`).
 7. Validate the final result against the task-specific checklist in [review-checklist.md](references/review-checklist.md).
+8. **Automated learning and reflection loop:** Before completing the turn, check whether the user provided feedback, rejected a pattern, or expressed a design preference during this session.
+   - Call `b0x_learn({ feedback })` to automatically distill the feedback into a reusable directive, auto-supersede conflicting earlier rules, or increment the reinforcement counter on confirmed patterns.
+   - If a diagnostic audit issue was resolved (`b0x_check_*`), call `b0x_learn_from_audit` to permanently record the verified fix so the defect is never repeated.
+   - Never finish a turn leaving explicit user corrections unlearned.
 
-For design or implementation tasks, follow [agent-workflow.md](references/agent-workflow.md), using its intent contract, state model, design envelope and explicit verification reporting. For real controls consult [interaction-patterns.md](references/interaction-patterns.md). For visual-system, icons or responsive changes consult [design-systems.md](references/design-systems.md) — it also carries the rule to use a maintained icon set such as Lucide rather than hand-drawn SVG. For animation, shadows, glow, morphing or motion accessibility consult [motion-effects.md](references/motion-effects.md). For content, consent, permission or cognitive clarity consult [content-trust-ethics.md](references/content-trust-ethics.md). For QA and testing consult [evaluation-playbook.md](references/evaluation-playbook.md). For this project's stored rejections and preferences consult [project-memory.md](references/project-memory.md). These are selectively loaded task guides, not mandatory reading for every trivial request.
+For design or implementation tasks, follow [agent-workflow.md](references/agent-workflow.md), using its intent contract, state model, design envelope and explicit verification reporting. For real controls consult [interaction-patterns.md](references/interaction-patterns.md). For visual-system, icons or responsive changes consult [design-systems.md](references/design-systems.md) — it also carries the rule to use a maintained icon set such as Lucide rather than hand-drawn SVG. For animation, shadows, glow, morphing or motion accessibility consult [motion-effects.md](references/motion-effects.md). For content, consent, permission or cognitive clarity consult [content-trust-ethics.md](references/content-trust-ethics.md). For QA and testing consult [evaluation-playbook.md](references/evaluation-playbook.md). For global roles and project-specific memory consult [project-memory.md](references/project-memory.md). These are selectively loaded task guides, not mandatory reading for every trivial request.
 
 When a finding needs a threshold rather than an opinion, take the number from [standards-targets.md](references/standards-targets.md) instead of asserting what feels adequate. When reviewing agent-generated or visibly generic output, read [ai-assisted-ui.md](references/ai-assisted-ui.md).
 
-## Learning from corrections
+## Automated learning engine
 
-When the user rejects a design choice or confirms one, that is per-project signal worth keeping. If the `b0x_*` tools are available and the feedback is durable — not a one-off instruction about a single element — record it with `b0x_record`: a rejection or explicit "never do this" as `kind: "rejection"`, a stated standing preference as `kind: "preference"`, an explicitly approved pattern as `kind: "praise"`.
+When the user rejects a design choice, corrects an element, or confirms a preference, that signal must be learned automatically:
+- **Call `b0x_learn({ feedback })`:** The tool automatically parses conversational input (e.g. *"I don't like the button padding, make it 8px"*), strips conversational noise, classifies the kind (`rejection`, `preference`, `praise`), extracts domain tags, and handles conflicts.
+- **Automatic conflict supersession:** If the new directive contradicts an earlier rule (e.g. changing cell padding from 16px to 8px), `b0x_learn` automatically supersedes the outdated rule, preventing conflicting instructions.
+- **Reinforcement tracking:** Repeatedly expressed preferences increment a reinforcement counter (`reinforced ×N`), signaling strong project consensus.
+- **Diagnostic learning:** When an audit tool (`b0x_check_*`) detects an issue and an approved fix is applied, call `b0x_learn_from_audit` to permanently record the remedy so the defect is never repeated.
 
-Record only what the user actually said. Do not infer preferences from their silence, and do not store a rule you extrapolated. When an earlier entry is superseded, remove it with `b0x_forget` rather than adding a contradicting one.
-
-Without the MCP tools, nothing changes: apply the correction immediately and carry it through the conversation. Never claim memory was stored if it was not.
+Without the MCP tools, apply the correction immediately in code and carry it through the conversation. Never claim memory was stored if it was not.
 
 ## Design priorities
 
