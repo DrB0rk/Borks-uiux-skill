@@ -140,3 +140,15 @@ Before reporting, ask:
 4. Which recommendations can share one underlying fix?
 5. Which findings rest on a threshold or cited source rather than on taste?
 6. Which observations are merely stylistic preference and should be omitted?
+
+## 16. Agent delivery and state completeness
+- Has the agent inspected real code, flows and design tokens before redesigning?
+- Are primary task and permissions expressed as observable transitions?
+- Are non-happy-path states real, wired and recoverable?
+- Are the control type and keyboard/focus patterns semantically correct?
+- Are responsive changes considered at component scope and tested with content expansion?
+- Is the design unmistakably relevant to the product's domain without gratuitous novelty?
+- Do claims distinguish automation, manual verification, measurements and untested paths?
+- Are user-facing actions, especially dangerous tools, approvals and model/effort settings, truthful and inspectable?
+
+See [agent-workflow.md](agent-workflow.md) and [evaluation-playbook.md](evaluation-playbook.md).
