@@ -79,6 +79,7 @@ Community-observed patterns, not authorship evidence. Treat them as prompts for 
 - glassmorphism on navigation or cards with no functional benefit;
 - all type set in the safest common sans with little hierarchy;
 - identical hover elevation or scale on every card;
+- a saturated accent bar on the leading edge of every selected nav row, stacked on top of a filled card;
 - reflexive dark mode used to signal sophistication;
 - bento grids where content has no unequal importance;
 - large whitespace around little content to simulate "premium".

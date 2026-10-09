@@ -81,6 +81,19 @@ Choose a limited number of deliberate distinctions based on product intent:
 
 Use real domain data and task-specific content. Avoid an exact three-card grid, giant hero, badge and glow treatment when the information model calls for a search interface, ledger or detail-first workflow. A standard pattern is good when it fits the task; novelty is not a measurable quality by itself.
 
+### Active and selected states
+
+Do not stack two competing emphasis treatments on the same item. The common default to avoid is a selected row rendered as a filled card *and* a saturated accent bar on its leading edge, so the item announces itself twice and the neighbouring items drift toward the same weight.
+
+Prefer one clear primary signal for the current item:
+- weight and contrast change on the label itself;
+- the item's background lifts while its neighbours stay flat;
+- a restrained indicator that is part of the item's own geometry rather than a border laid on top of it.
+
+If a leading accent edge is used, keep it quiet — low-chroma, consistent thickness, and paired with a non-colour signal such as `aria-current` so state is never carried by colour alone.
+
+This is a default, not a prohibition. A leading-edge indicator is a legitimate convention for current-page navigation, and it is the right choice when the item has no fill of its own. Use it where it earns its place, and drop it when the card fill already communicates selection.
+
 ## 8. Change management
 
 When editing an existing design system, document any new token, variant or exception and where it is used. Prefer a migration path for renamed tokens. Test representative components and states against new mappings before making a repo-wide replacement. Do not introduce a design-system dependency solely to apply a familiar aesthetic.

@@ -46,6 +46,8 @@ Use only the sections relevant to the product and task. This is a review aid, no
 - Is whitespace used to communicate grouping rather than simply increase emptiness?
 - Is contrast sufficient and intentional?
 - Is accent color reserved for meaningful priority/state?
+- Do active/selected items use one primary emphasis signal, rather than stacking a filled card with a saturated accent edge?
+- Where an accent edge marks the current item, is state also conveyed without relying on colour alone?
 - Are cards/borders/shadows doing structural work, or just adding visual noise?
 - Does the layout remain balanced without flattening important hierarchy?
 
