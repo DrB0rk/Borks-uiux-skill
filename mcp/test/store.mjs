@@ -42,8 +42,8 @@ console.log("=== global repository roles & baseline rules ===");
   check("getRole('ui-engineer') returns directives", Array.isArray(role?.directives) && role.directives.length > 0);
 
   const baseline = S.getGlobalBaseline();
-  check("baseline rejections exist", Array.isArray(baseline.rejections) && baseline.rejections.length >= 6);
-  check("baseline preferences exist", Array.isArray(baseline.preferences) && baseline.preferences.length >= 7);
+  check("baseline rejections exist", Array.isArray(baseline.rejections) && baseline.rejections.length >= 8);
+  check("baseline preferences exist", Array.isArray(baseline.preferences) && baseline.preferences.length >= 12);
 
   const rejTexts = baseline.rejections.map((e) => e.text);
   check("baseline rejects hand-drawn SVG icons", rejTexts.some((t) => t.includes("Lucide")));
@@ -52,6 +52,15 @@ console.log("=== global repository roles & baseline rules ===");
   check("baseline rejects calling GSAP simply free", rejTexts.some((t) => t.includes("GSAP as simply free")));
   check("baseline rejects treating taste as defects", rejTexts.some((t) => t.includes("subjective taste")));
   check("baseline rejects fake trust signals", rejTexts.some((t) => t.includes("fake urgency") || t.includes("trust signals")));
+  check("baseline rejects layout-thrash animations", rejTexts.some((t) => t.includes("layout-triggering")));
+  check("baseline rejects streaming AI jitter", rejTexts.some((t) => t.includes("scroll-anchoring")));
+
+  const prefTexts = baseline.preferences.map((e) => e.text);
+  check("baseline prefers oklch colors", prefTexts.some((t) => t.includes("oklch")));
+  check("baseline prefers container queries", prefTexts.some((t) => t.includes("container queries")));
+  check("baseline prefers Popover API", prefTexts.some((t) => t.includes("Popover API")));
+  check("baseline prefers INP performance", prefTexts.some((t) => t.includes("INP")));
+  check("baseline prefers linear() spring physics", prefTexts.some((t) => t.includes("linear()")));
 }
 
 console.log("=== loadMerged: repository baseline + project memory ===");
@@ -61,11 +70,10 @@ console.log("=== loadMerged: repository baseline + project memory ===");
   S.append(root, S.normalise({ kind: "preference", text: "Project specific preference 1" }));
 
   const merged = S.loadMerged(root);
-  check("merged contains globalRepo rejections", merged.globalRepo.rejections.length >= 6);
-  check("merged contains globalRepo preferences", merged.globalRepo.preferences.length >= 7);
+  check("merged contains globalRepo rejections", merged.globalRepo.rejections.length >= 8);
+  check("merged contains globalRepo preferences", merged.globalRepo.preferences.length >= 12);
   check("merged contains project entries", merged.project.length === 1);
-  check("merged all combines both", merged.all.length >= 14);
-
+  check("merged all combines both", merged.all.length >= 21);
   fs.rmSync(root, { recursive: true, force: true });
 }
 

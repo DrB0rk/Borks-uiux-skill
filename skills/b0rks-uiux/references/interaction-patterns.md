@@ -39,10 +39,12 @@ Use this when implementing or reviewing a concrete control. Prefer native HTML a
 - A combobox has nuanced focus and arrow-key expectations; follow the corresponding APG subtype. Preserve standard text-editing shortcuts, IME composition and Escape behaviour.
 - Prefer an ordinary select when native filtering and styling are adequate.
 - Menu semantics are for **commands**, not arbitrary navigation links or a form containing inputs. Use a disclosure or navigation list when that matches the content.
+- **Popover API versus `<dialog>`:**
+  - Use `popover="auto"` for lightweight non-modal overlays: dropdown menus, combobox lists, contextual help, and action popovers. The browser manages top-layer promotion (no `z-index` fights), native light-dismiss on outside click or Escape, and focus restoration without custom JS trap hacks.
+  - Use `<dialog>` with `showModal()` when the user must focus exclusively on the interaction (e.g. destructive confirmation, authentication). It renders a backdrop, makes the background inert, and traps keyboard focus intentionally.
 - Ensure visible open/closed state, placement, keyboard control, active-option announcement, selection, and click-outside dismissal where appropriate.
 - Search results require a clear "no matches" state and a way to recover.
-- Reference: [combobox](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/) and [menu button](https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/).
-
+- Reference: [combobox](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/), [menu button](https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/), and [Popover API](https://developer.mozilla.org/en-US/docs/Web/API/Popover_API).
 ## Tabs, tables, grids and trees
 
 - Use tabs for alternate peer views of the **same context**. Do not use them as unrelated site navigation.
@@ -90,8 +92,11 @@ These controls deserve a specific contract because they mix high-frequency input
 - Treat a tool call as a traceable operation: queued, running, succeeded, failed, awaiting approval, cancelled. Do not claim work is completed because text was streamed.
 - For shell commands, file edits, network actions, secret exposure or permissions, display the proposed scope and require appropriate approval before dangerous execution.
 - Preserve composer drafts and context when switching model or background job. Show host/project/directory when sessions could otherwise be confused.
-- Render streamed responses without stealing focus, generating excessive live-region announcements or destabilising scroll position.
+- Render streamed responses with scroll-anchoring: if the user scrolls up during generation, pause autoscroll immediately and display a "Scroll to latest" affordance rather than yanking the viewport. Buffer markdown at block boundaries (codeblocks, tables, lists) to prevent jarring layout shifts and reflow thrash as tokens stream.
+- **Generative UI over raw text:** When the agent returns structured data (tables, options, diffs, forms), render interactive, accessible components rather than unformatted markdown walls.
+- **Human-in-the-loop (HITL) approval diffs:** For file edits, command execution, and state mutations, provide clear two-way diffs with dry-run previews and reversible undo/rollback affordances.
 - Put background tasks in persistent, inspectable affordances, with cancellation and a clear relationship to the active conversation.
+- Display reasoning/thinking output in a collapsible disclosure that collapses upon completion, keeping the primary response visually dominant.
 - A permission-denied or disconnected host state must not look like an empty response.
 
 ## Anti-pattern review

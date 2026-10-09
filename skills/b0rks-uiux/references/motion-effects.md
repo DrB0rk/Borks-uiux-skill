@@ -91,6 +91,92 @@ Note that this skill's own [ai-assisted-ui.md](ai-assisted-ui.md) lists glow and
 - Slide-in panels should respect safe areas on mobile and account for the virtual keyboard.
 - Never animate something *into* the viewport and leave it covering the trigger or trapping focus — see the interaction-patterns reference for dialog focus management.
 
+
+## Pure-CSS spring physics with linear()
+
+The CSS `linear()` easing function (Baseline Widely Available across all browsers since December 2023) accepts piecewise control points. It allows approximating damped spring physics and bounce curves entirely in CSS without shipping a JavaScript animation runtime:
+
+```css
+/* A damped spring transition in pure CSS */
+:root {
+  --spring-bounce: linear(
+    0, 0.009, 0.035 2.1%, 0.141 4.4%, 0.723 12.9%, 0.938 16.7%, 1.017,
+    1.049, 1.054 22.8%, 1.028 26.6%, 0.999 30.6%, 0.989 34.6%, 0.993 40.2%,
+    1 48.6%
+  );
+}
+
+.interactive-card {
+  transition: transform 450ms var(--spring-bounce);
+}
+```
+
+Use `linear()` springs for micro-interactions: button presses, toggle switches, badge pop-ins, and drawer snaps. When user prefers reduced motion, collapse the duration to `0.01ms`.
+
+## View Transitions API
+
+For multi-element state transitions — such as filtering a list, expanding a card to a full-screen view, or navigating between pages — the **View Transitions API** provides browser-native DOM capture and cross-fade/morphing:
+
+```javascript
+// Single-page app transition
+function updateView(newData) {
+  if (!document.startViewTransition) {
+    render(newData);
+    return;
+  }
+  document.startViewTransition(() => {
+    render(newData);
+  });
+}
+```
+
+Pair elements across transitions using the CSS property `view-transition-name`:
+
+```css
+.hero-image-thumbnail {
+  view-transition-name: hero-target;
+}
+
+.hero-image-expanded {
+  view-transition-name: hero-target;
+}
+```
+
+For multi-page architectures (MPA), use the declarative CSS rule:
+
+```css
+@view-transition {
+  navigation: auto;
+}
+```
+
+## Entry and exit animations with @starting-style
+
+Historically, animating elements from `display: none` or top-layer elements (`<dialog>`, Popover API) required JavaScript frame hacks. With modern CSS (Baseline 2024/2025 across all engines), use `@starting-style` and `transition-behavior: allow-discrete`:
+
+```css
+/* Native Popover / Dialog animation with @starting-style */
+[popover] {
+  opacity: 0;
+  transform: scale(0.95);
+  transition: opacity 200ms ease, transform 200ms ease, display 200ms allow-discrete, overlay 200ms allow-discrete;
+}
+
+[popover]:popover-open {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* State before the element is opened */
+@starting-style {
+  [popover]:popover-open {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+```
+
+This works seamlessly with the native Popover API (`popover`, `popovertarget`) and native `<dialog>`, eliminating the need for custom JS-based overlay animation managers.
 ## Motion accessibility
 
 **The criterion people most often get wrong:** WCAG 2.2 **SC 2.3.3 Animation from Interactions is Level AAA**, not AA. It requires that motion animation triggered by interaction can be disabled unless the animation is essential. Because it is AAA it is not part of an AA conformance claim — but honouring it is cheap and correct.

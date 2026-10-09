@@ -31,7 +31,10 @@ Focus Appearance (SC 2.4.13) is **Level AAA**, not part of the Level AA baseline
 | Primary touch target (internal target) | roughly 44 × 44 CSS px | Apple HIG, Fluent 2 |
 | Android interactive target | 48 × 48 dp | Android |
 | Reflow | no loss or two-dimensional scrolling at 320 CSS px equivalent | WCAG 1.4.10 |
-
+| INP (Interaction to Next Paint) | ≤ 200 ms at p75 (Good threshold) | Core Web Vitals (W3C/Chrome) |
+| LCP (Largest Contentful Paint) | ≤ 2.5 s at p75 | Core Web Vitals |
+| CLS (Cumulative Layout Shift) | ≤ 0.1 at p75 | Core Web Vitals |
+| LoAF animation frame delay | ≤ 50 ms main-thread task threshold | W3C Long Animation Frames API |
 **On target size:** 24 × 24 CSS px is a *conformance minimum*, not good touch design. It comes with documented exceptions (spacing, inline targets, essential cases, user-agent control). For primary touch interactions, treat ~44–48 units as the real internal target.
 
 **On hit areas:** the interactive hit area can be larger than the visible icon. A 16 px icon inside a 44 px button is not an oversized button. Judge the target, not the glyph.
@@ -90,6 +93,24 @@ Core Web Vitals, assessed separately for mobile and desktop at the 75th percenti
 
 These are the load and interaction budgets behind the Doherty Threshold principle. A polished interface that responds slowly is not high-quality UX — and equally, performance work should not strip required feedback or accessibility semantics to hit a number.
 
+### INP sub-parts & LoAF diagnosis
+
+INP officially replaced FID as a Core Web Vital. It measures the longest latency of user interactions throughout the page lifecycle:
+- **Input delay:** time from user action to event handler start (must yield main thread quickly).
+- **Processing duration:** time spent executing JS event callbacks (split long tasks > 50 ms using `scheduler.yield()` or micro-tasks).
+- **Presentation delay:** time from event callback end to browser painting the next frame.
+
+Use the **Long Animation Frames (LoAF) API** (W3C Working Draft) to diagnose frames where rendering was delayed beyond 50 ms. LoAF identifies the exact script URL, character position, and invoker causing interaction latency.
+
+## Modern CSS primitives & web baseline
+
+Modern interface implementations should leverage platform-native standards that have achieved Baseline status across modern browser engines:
+
+- **Container Queries (@container):** Baseline Widely Available. Components must be intrinsically responsive to their container width (`@container (min-width: ...)` and units `cqw`, `cqi`), rather than relying exclusively on global viewport media queries.
+- **Popover API:** Baseline 2025. Use the native HTML `popover` attribute and `popovertarget` button attribute for tooltips, menus, and contextual overlays. The browser handles top-layer promotion, native light-dismiss on outside click or Escape, and focus management without custom JS traps.
+- **@starting-style & allow-discrete:** Baseline 2024/2025. Enables CSS-only transitions from `display: none` or top-layer elements using `transition-behavior: allow-discrete` and `@starting-style` for entry/exit keyframes without flash of unstyled content.
+- **oklch() color space:** Baseline Widely Available. Use `oklch(L C H)` for theme palettes and programmatic contrast. Unlike HSL, OKLCH has perceptual lightness uniformity: a lightness of `0.7` has the same perceived brightness across all hues, preventing contrast degradation across theme tints.
+- **View Transitions API:** Native morphing between DOM states via `document.startViewTransition()` and multi-page cross-document `@view-transition { navigation: auto; }`.
 ## Motion
 
 Respect `prefers-reduced-motion` and remove or reduce non-essential motion. Motion should explain causality, orientation, state change, or hierarchy. Decorative motion that competes with the user's task should be restrained or removed — including universal `hover:scale-*`, continuous background animation, and spring effects on frequent workflows.
@@ -116,4 +137,4 @@ Pass manually before calling a flow done:
 
 Thresholds marked *verified* were checked directly against the normative source during this skill's research pass. Where the underlying research is an extended abstract or practitioner reflection rather than a full empirical study, [sources.md](sources.md) records that, and findings depending on it should be stated as directional rather than measured.
 
-Accessibility targets here are engineering guidance, not legal advice. Jurisdictional obligations differ — in the EU, for example, the currently harmonised EN 301 549 still draws heavily on WCAG 2.1, and a newer WCAG version does not become legally binding merely by being published. That nuance is a reason to consult counsel for compliance claims, not a reason to build to a weaker bar.
+Accessibility targets here are engineering guidance, not legal advice. Jurisdictional obligations differ: under the EU Web Accessibility Directive, the harmonised standard EN 301 549 v3.2.1 still formally references WCAG 2.1, and newer WCAG versions do not acquire legal force automatically upon publication. Separately, the European Accessibility Act (EAA) entered active legal enforcement across all EU member states on 28 June 2025, mandating digital accessibility for commercial products, e-commerce, banking, and transport services. Consult qualified legal counsel for compliance claims.

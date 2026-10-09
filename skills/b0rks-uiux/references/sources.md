@@ -48,6 +48,13 @@ Every citation below was checked against its source during the integration of th
 
 **Tier D — live but observational.** Practitioner commentary on AI-generated UI conventions is used only to corroborate implementation smells already supported by stronger accessibility and usability evidence. Such sources never establish authorship and never justify a requirement on their own.
 
+
+**Modern web standards, CSS baseline & performance (2025–2026) — verified.** Direct primary-source checks:
+
+- **Modern CSS Baseline — verified.** MDN confirms Baseline Widely Available for Container Queries (`@container`, `cqw`, `cqi`), `oklch()` color space (May 2023), and CSS `linear()` piecewise easing (December 2023). Popover API (`popover`, `popovertarget`, `:popover-open`) is Baseline 2025 across all engines. `@starting-style` and `transition-behavior: allow-discrete` are Baseline 2024/2025. View Transitions API is documented by W3C CSS WG and MDN (`startViewTransition()`, `@view-transition`).
+- **Performance & Core Web Vitals — verified.** web.dev confirms INP officially replaced FID as the responsiveness Core Web Vital in March 2024 (Good ≤ 200 ms at p75). The Long Animation Frames (LoAF) API reached W3C First Public Working Draft status in April 2026, diagnosing rendering updates delayed beyond 50 ms.
+- **Design Tokens Community Group (DTCG) — verified.** W3C Design Tokens Community Group published the Design Tokens Format Module 2025.10 as a stable final Community Group Report on 28 October 2025. Style Dictionary v4 provides native first-class support for the `$value`, `$type`, `$description` format.
+- **Evolving accessibility standards & regulations — verified.** WAI-ARIA 1.3 reached W3C Working Draft status in June 2026 (Editor's Draft September 2026), adding `suggestion`, `comment`, `mark` roles and `aria-description`, `aria-braillelabel`. WCAG 3.0 remains an active W3C Working Draft (March & September 2026), transitioning toward outcome-oriented assertion testing; WCAG 2.2 AA remains the current normative engineering baseline. European Accessibility Act (EAA) entered active legal enforcement across all EU member states on 28 June 2025.
 ### Standing rule
 
 No numeric research finding should be restated in this skill unless the underlying source supports that specific number. Where evidence is an extended abstract, a practitioner reflection, or observational commentary, the conclusion is stated at the strength the evidence actually carries, and the weakness is recorded rather than smoothed over.

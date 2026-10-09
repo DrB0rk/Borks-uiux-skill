@@ -44,6 +44,9 @@ Keep stroke width consistent across a set. Lucide uses a consistent stroke by de
 | Component | `button.primary.background` | Controlled component-specific mapping |
 
 - Make status, error, warning, success and interactive focus colors semantic and test contrast **in each theme/state**.
+- **oklch() for color tokens:** Prefer `oklch(lightness chroma hue)` for generating design system color scales. Unlike sRGB or HSL, OKLCH has perceptual lightness uniformity: a lightness of `0.65` produces the same perceived brightness across blues, yellows, greens, and reds, preventing accessibility contrast degradation across theme tints.
+- **Fluid scales with `clamp()`:** Use `clamp(min, preferred, max)` combining `rem` and `vw` for typography and spacing scales. This provides smooth scaling between mobile and desktop without layout pop across intermediate widths.
+- **Headless component primitives:** Decouple interaction state, keyboard navigation, and accessibility semantics from visual styling by building on headless primitives (Radix UI, React Aria Components, Ark UI / Zag.js finite state machines). Let the headless primitive guarantee the APG interaction contract while design tokens control the visual presentation.
 - Define a deliberate density model. A financial ledger, coding IDE and marketing page should not all use identical spacing.
 - Avoid leaking raw hex values into every page. Use a clear exception policy for truly unique visuals.
 - Prefer logical spacing and typography scales over arbitrary values repeated throughout components.
@@ -51,7 +54,7 @@ Keep stroke width consistent across a set. Lucide uses a consistent stroke by de
 
 ### DTCG interoperability
 
-The [Design Tokens Format Module 2025.10](https://www.designtokens.org/TR/2025.10/format/) is a **stable final Community Group Report**, not a W3C Recommendation. Consider it for cross-tool token exchange; it does not require teams to refactor an established CSS-variable system. Use its `$type`, `$value`, group and alias concepts accurately. Do not implement newer preview drafts as if final.
+The [Design Tokens Format Module 2025.10](https://www.designtokens.org/TR/2025.10/format/) is a **stable final Community Group Report**, not a W3C Recommendation. As of version 4, Style Dictionary provides native first-class support for the DTCG format. Use its `$type`, `$value`, group, and alias concepts accurately (`{color.action.primary}`). Consider it for cross-tool token exchange; it does not require teams to refactor an established CSS-variable system. Do not implement newer preview drafts as if final.
 
 Example of a *conceptual* source token representation (validate exact syntax against the format before using in production):
 
