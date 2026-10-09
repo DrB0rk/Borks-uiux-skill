@@ -81,6 +81,8 @@ skills/bizar-uiux/
 │   └── sources.md                # Provenance and per-source verification status
 └── agents/
     └── openai.yaml               # Display metadata for OpenAI-compatible hosts
+
+package.json                     # OMP plugin + npm package manifest
 ```
 
 The layout is [progressive disclosure](https://en.wikipedia.org/wiki/Progressive_disclosure): only `SKILL.md` loads when the skill triggers, and the reference files load only when the specific task needs them. Roughly **116 tokens** of frontmatter description sit in context at all times; a triggered load pulls in ~2.0k more, and the references add more only when a task actually needs them.
@@ -89,7 +91,43 @@ The layout is [progressive disclosure](https://en.wikipedia.org/wiki/Progressive
 
 ## Install
 
-### Claude Code / OMP (recommended)
+### As an OMP plugin (recommended for OMP)
+
+This repo is a valid OMP plugin package. Install it like any other plugin:
+
+```bash
+omp plugin install github:DrB0rk/Borks-uiux-skill
+```
+
+Or from a local clone:
+
+```bash
+git clone https://github.com/DrB0rk/Borks-uiux-skill.git
+omp plugin install ./Borks-uiux-skill
+```
+
+> The `github:` prefix is required — a bare `DrB0rk/Borks-uiux-skill` is rejected as an invalid package name.
+
+Verify it registered:
+
+```bash
+omp plugin list
+# ● bizar-uiux-skill@0.1.0
+```
+
+Restart OMP. The skill is discovered under its plugin namespace as `bizar-uiux-skill/bizar-uiux`, so it won't collide with the copy bundled in `@polderlabs/bizar-omp` — both can be present, and the namespaced one is the one tracking this repository.
+
+### On the Skillshare registry
+
+The skill also publishes to the OMP skill registry at [skills.omp.sh](https://skills.omp.sh):
+
+```bash
+omp skill install @<scope>/bizar-uiux
+```
+
+> **Requires a Stencil account.** Run `omp` and use `/login → Stencil`, or set `STENCIL_API_KEY`. Publishing from this repo uses `omp skill publish ./skills/bizar-uiux`.
+
+### As a standalone skill (Claude Code / OMP)
 
 Agents discover a skill when `SKILL.md` sits directly inside a folder named after the skill. This repo mirrors the upstream package layout, so copy the skill directory itself:
 

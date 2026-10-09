@@ -1,6 +1,8 @@
 ---
 name: bizar-uiux
 description: Design, review, and improve user interfaces and user experiences using a practical synthesis of established UX psychology and UI composition principles. Use for UI/UX audits, redesigns, component design, interaction flows, onboarding, navigation, forms, dashboards, responsive layouts, accessibility-oriented interface review, visual hierarchy, information architecture, conversion/decision flows, and frontend implementation where user experience quality matters.
+metadata:
+  version: 0.1.0
 ---
 
 # Bizar UI/UX

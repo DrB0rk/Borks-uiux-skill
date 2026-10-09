@@ -1,0 +1,39 @@
+{
+  "name": "bizar-uiux-skill",
+  "version": "0.1.0",
+  "description": "UI/UX design and review skill for OMP — behavioural design principles, verified WCAG 2.2 targets, and AI-assisted UI quality review.",
+  "license": "MIT",
+  "type": "module",
+  "keywords": [
+    "omp",
+    "omp-plugin",
+    "oh-my-pi",
+    "uiux",
+    "ux-design",
+    "accessibility",
+    "design-system",
+    "ai-skills"
+  ],
+  "files": [
+    "skills/",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DrB0rk/Borks-uiux-skill.git"
+  },
+  "homepage": "https://github.com/DrB0rk/Borks-uiux-skill#readme",
+  "bugs": {
+    "url": "https://github.com/DrB0rk/Borks-uiux-skill/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "omp": {
+    "skills": [
+      "skills"
+    ]
+  }
+}
