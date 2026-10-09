@@ -74,3 +74,6 @@ Accessibility content in this skill is engineering guidance, not legal advice. J
 ## Evidence discipline
 
 These principles are heuristics, not empirical guarantees for every context. When product analytics, usability tests, accessibility requirements, platform conventions, or direct user research contradict a heuristic, prefer the stronger task-specific evidence.
+## October 2026 additions
+
+For primary links and the normative/official/heuristic distinction covering ARIA APG, WCAG focus conformance levels, cognitive accessibility, responsive CSS, DTCG design tokens, Playwright and GOV.UK patterns, see [research-addendum-2026.md](research-addendum-2026.md). Agent-specific workflows and scorecards are an **original engineering synthesis**, not externally standardized or causally validated research findings.
