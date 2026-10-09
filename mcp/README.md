@@ -73,7 +73,10 @@ Writes are atomic (temp file + rename), so an interrupted call cannot corrupt `e
 | `b0x_record` | Store durable feedback (`scope: "project"` or `scope: "global"`) |
 | `b0x_list` | Inspect entries, with `kind` and `scope` filters (`all`, `global`, `project`) |
 | `b0x_forget` | Remove or supersede an entry by id |
-
+| `b0x_check_contrast` | Audit contrast against WCAG 2.2 AA/AAA (text 4.5:1, component 3:1). Supports hex, rgb, hsl, oklch. Suggests passing colors |
+| `b0x_check_target` | Validate target sizes against WCAG 2.5.8 (24×24 px), Apple HIG (44×44), Android (48×48). Calculates padding expansion |
+| `b0x_check_html` | Fast static audit of HTML/JSX snippet or component file for unlabeled inputs, unnamed icon buttons, clickable divs, layout animation |
+| `b0x_check_tokens` | Validate Design Tokens against DTCG 2025.10 and catch raw hex leaks in component layers |
 `b0x_record` takes `kind` ∈ `rejection` (hard) | `preference` (soft) | `praise` (confirmed working), `text` (≤2000 chars, clamped), optional `tags`, and optional `scope` (`project` for local `.b0x/` [default], or `global` for user `~/.b0x/`).
 Input validation happens at the schema layer: an invalid `kind` comes back as an MCP `isError` result naming the allowed values, before any file is touched.
 

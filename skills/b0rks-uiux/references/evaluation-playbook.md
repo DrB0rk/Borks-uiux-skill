@@ -18,13 +18,13 @@ These sample viewport widths are **engineering test choices**, not formal breakp
 ## Required verification sequence
 
 1. Run repository checks (build, lint, typecheck, unit/component tests) where available.
-2. Confirm markup and control semantics, accessible names, roles, state and label relationships.
+2. Confirm markup and control semantics, accessible names, roles, state and label relationships. Run static accessibility linting (`b0x_check_html` or `./scripts/audit-ui.js --html / --file`) to catch unlabeled inputs, unnamed icon buttons, clickable non-semantic elements, and layout-thrashing transitions.
 3. Run automated accessibility checks on key pages and open dialogs using an appropriate tool (e.g. axe + Playwright).
 4. Walk through the key user journey with keyboard only, checking focus visibility, order, return, Escape and submission.
 5. Test manual screen reader announcement of names, errors, status and composite widgets using at least one supported screen reader/browser combination.
 6. Exercise blank/error/loading/permission/offline paths; prove failed submissions retain entered data and expose retry.
 7. Inspect responsive surfaces at narrow and wide widths and zoom. Test overflow and virtual-keyboard obstruction.
-8. Check contrast and forced-colors behavior. Verify target hit areas, not just glyph sizes.
+8. Check contrast (`b0x_check_contrast` or `./scripts/audit-ui.js --contrast`) across all text (4.5:1 / 3:1) and UI components (3:1). Verify target hit areas (`b0x_check_target` or `./scripts/audit-ui.js --target`) against WCAG 2.5.8 (24×24 px minimum) and platform comfort (44×44 / 48×48 px). Test forced-colors behavior.
 9. For production web performance, use field data for Core Web Vitals where available, and lab traces for debugging; do not represent a one-off Lighthouse score as field performance.
 10. Inspect final screenshots/recordings for hierarchy, information density and visual consistency only after functional checks.
 

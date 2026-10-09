@@ -2,7 +2,7 @@
 name: b0rks-uiux
 description: Research, design, implement, audit, and validate UI/UX in web, mobile, and developer tools. Use for frontend coding, interface design, redesigns, responsive layouts, design systems and tokens, component interactions, agent/chat interfaces, forms, accessibility, content design, keyboard usability, interaction state modeling, performance, and AI-generated UI quality review. Produce evidence-backed fixes, complete states, and practical verification rather than generic visual polish.
 metadata:
-  version: 0.7.0
+  version: 0.8.0
 ---
 
 # B0rk's UI/UX SKILL
@@ -17,7 +17,12 @@ Use this skill to turn interface work into explicit, testable design decisions i
 3. Find the highest-friction moments first: uncertainty, too many choices, poor target sizing, weak hierarchy, hidden state, long waits, unclear grouping, or broken conventions.
 4. Map each material problem to one or more relevant principles from [principles.md](references/principles.md).
 5. Propose the smallest design change that removes friction without adding decorative complexity.
-6. Check the proposal against accessibility, consistency, responsive behavior, error recovery, and implementation cost.
+6. Check the proposal against accessibility, consistency, responsive behavior, error recovery, and implementation cost. When the `b0x_*` MCP tools are available, run automated diagnostics:
+   - Call `b0x_check_contrast` to verify color pairs against WCAG 2.2 AA (4.5:1 text, 3:1 components) and receive automatic passing color adjustments.
+   - Call `b0x_check_target` to verify touch and pointer target sizes against WCAG 2.5.8 (24×24 px minimum) and platform touch comfort (44×44 / 48×48 px).
+   - Call `b0x_check_html` on markup snippets or component files to catch unlabeled inputs, unnamed icon buttons, clickable non-semantic elements, and layout-thrashing animations before presentation.
+   - Call `b0x_check_tokens` on design token dictionaries to validate DTCG 2025.10 compliance and prevent raw values leaking into component layers.
+   - In shell/CI contexts, run `./scripts/audit-ui.js` (`--contrast`, `--target`, `--html`, `--file`, `--tokens`).
 7. Validate the final result against the task-specific checklist in [review-checklist.md](references/review-checklist.md).
 
 For design or implementation tasks, follow [agent-workflow.md](references/agent-workflow.md), using its intent contract, state model, design envelope and explicit verification reporting. For real controls consult [interaction-patterns.md](references/interaction-patterns.md). For visual-system, icons or responsive changes consult [design-systems.md](references/design-systems.md) — it also carries the rule to use a maintained icon set such as Lucide rather than hand-drawn SVG. For animation, shadows, glow, morphing or motion accessibility consult [motion-effects.md](references/motion-effects.md). For content, consent, permission or cognitive clarity consult [content-trust-ethics.md](references/content-trust-ethics.md). For QA and testing consult [evaluation-playbook.md](references/evaluation-playbook.md). For this project's stored rejections and preferences consult [project-memory.md](references/project-memory.md). These are selectively loaded task guides, not mandatory reading for every trivial request.

@@ -205,8 +205,8 @@ skills/b0rks-uiux/
 └── agents/
     └── openai.yaml               # Display metadata for OpenAI-compatible hosts
 
-mcp/                              # Local b0x MCP server — per-project design memory
-scripts/                          # validate.sh, install-mcp.sh
+mcp/                              # Local b0x MCP server — per-project design memory & diagnostic tools
+scripts/                          # validate.sh, install-mcp.sh, audit-ui.js
 package.json                      # OMP plugin + npm package manifest
 ```
 
@@ -237,7 +237,7 @@ Verify it registered:
 
 ```bash
 omp plugin list
-# ● b0rks-uiux-skill@0.7.0
+# ● b0rks-uiux-skill@0.8.0
 ```
 
 Restart OMP after installation. The skill is then available as `b0rks-uiux`. Hosts bundling older copies must migrate explicitly — `b0rks-uiux` is a new identifier, not a backward-compatible alias for `bizar-uiux`.
@@ -318,6 +318,26 @@ Review src/components/DataTable.tsx for accessibility and responsive behavior.
 
 Severity is assigned by impact, and the skill is explicitly instructed to **omit subjective style preferences**.
 
+
+## Automated diagnostic tooling
+
+The skill and `b0x` server include dynamic diagnostic tools that agents invoke to catch accessibility, contrast, and layout issues before presenting designs:
+
+| Tool | CLI command | What it checks |
+|---|---|---|
+| `b0x_check_contrast` | `./scripts/audit-ui.js --contrast <fg> <bg>` | WCAG 2.2 contrast ratio (4.5:1 text, 3:1 components) across Hex, RGB, HSL, and OKLCH. Suggests passing colors |
+| `b0x_check_target` | `./scripts/audit-ui.js --target <w> <h> [--padding <px>]` | Touch/pointer hit area against WCAG 2.5.8 (24×24 px), Apple HIG (44×44), Android (48×48). Recommends padding expansion |
+| `b0x_check_html` | `./scripts/audit-ui.js --html "<snippet>" / --file <path>` | Fast static audit of HTML/JSX: catches unlabeled inputs, unnamed icon buttons, clickable non-semantic divs, layout animations, marketing fluff |
+| `b0x_check_tokens` | `./scripts/audit-ui.js --tokens <tokens.json>` | Design Tokens dictionary validation against DTCG 2025.10 and semantic layer leaks |
+
+Run checks directly in the shell or CI:
+
+```bash
+./scripts/audit-ui.js --contrast "#0f172a" "#ffffff"
+./scripts/audit-ui.js --target 16 16 --padding 14
+./scripts/audit-ui.js --html '<form><input type="text"><button><svg/></button></form>'
+./scripts/audit-ui.js --file src/components/NavBar.tsx
+```
 ---
 
 ## Design priorities

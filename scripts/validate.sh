@@ -117,10 +117,16 @@ fi
 
 # 7. MCP server is present and syntactically loadable
 if [[ -f mcp/src/index.js ]]; then
-  if node --check mcp/src/index.js 2>/dev/null && node --check mcp/src/store.js 2>/dev/null; then
-    ok "mcp server sources parse"
+  if node --check mcp/src/index.js 2>/dev/null && \
+     node --check mcp/src/store.js 2>/dev/null && \
+     node --check mcp/src/tools/contrast.js 2>/dev/null && \
+     node --check mcp/src/tools/target.js 2>/dev/null && \
+     node --check mcp/src/tools/html-lint.js 2>/dev/null && \
+     node --check mcp/src/tools/tokens-lint.js 2>/dev/null && \
+     node --check scripts/audit-ui.js 2>/dev/null; then
+    ok "all mcp server, audit tools, and CLI sources parse cleanly"
   else
-    bad "mcp server has a syntax error"
+    bad "one or more source files has a syntax error"
   fi
 else
   bad "mcp/src/index.js missing"

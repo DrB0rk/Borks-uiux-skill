@@ -8,9 +8,15 @@
 //
 // Storage is a `.b0x/` folder at the project root. Nothing leaves the machine.
 
+import fs from "node:fs";
+import path from "node:path";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
+import { auditContrast, auditPalette } from "./tools/contrast.js";
+import { auditTargetSize } from "./tools/target.js";
+import { auditHtml } from "./tools/html-lint.js";
+import { auditTokens } from "./tools/tokens-lint.js";
 import {
   KINDS,
   append,
@@ -266,6 +272,134 @@ server.registerTool(
     const root = proj.available === false ? null : proj.root;
     const entries = root && isInitialised(root) ? load(root) : [];
     return asText(renderContext(root, entries, role));
+  }
+);
+
+server.registerTool(
+  "b0x_check_contrast",
+  {
+    title: "WCAG 2.2 color contrast & passing color suggestion",
+    description:
+      "Audit contrast between foreground and background colors against WCAG 2.2 AA (4.5:1 text, 3:1 large/component) and AAA (7:1). Supports hex (#fff), rgb(), hsl(), oklch(), and named colors. Suggests passing colors when failing. Also supports batch palette checks.",
+    inputSchema: {
+      foreground: z.string().optional().describe("Foreground color string (hex, rgb, hsl, oklch, or named color)"),
+      background: z.string().optional().describe("Background color string (hex, rgb, hsl, oklch, or named color)"),
+      role: z
+        .enum(["normal-text", "large-text", "ui-component", "non-text"])
+        .optional()
+        .describe("Semantic role: 'normal-text' (>= 4.5:1, default), 'large-text' (>= 3:1), or 'ui-component' (>= 3:1)"),
+      palette: z
+        .array(
+          z.object({
+            foreground: z.string(),
+            background: z.string(),
+            role: z.enum(["normal-text", "large-text", "ui-component", "non-text"]).optional(),
+          })
+        )
+        .optional()
+        .describe("Batch audit of multiple color pairs in a palette"),
+    },
+  },
+  async ({ foreground, background, role = "normal-text", palette }) => {
+    try {
+      if (palette && Array.isArray(palette)) {
+        return asText(auditPalette(palette));
+      }
+      if (!foreground || !background) {
+        return asText({ ok: false, error: "Provide either { foreground, background } or a { palette: [...] } array." });
+      }
+      return asText(auditContrast(foreground, background, role));
+    } catch (err) {
+      return asText({ ok: false, error: String(err?.message ?? err) });
+    }
+  }
+);
+
+server.registerTool(
+  "b0x_check_target",
+  {
+    title: "Touch and pointer target size validator",
+    description:
+      "Audit touch/pointer target dimensions against WCAG 2.5.8 (24x24 px min, Level AA), Apple HIG (44x44 pt), and Android Material (48x48 dp). Calculates recommended hit area / padding expansion for undersized controls.",
+    inputSchema: {
+      width: z.number().describe("Visible width in CSS pixels (e.g. 16, 24, 44)"),
+      height: z.number().describe("Visible height in CSS pixels (e.g. 16, 24, 44)"),
+      padding: z.union([z.number(), z.object({ x: z.number(), y: z.number() })]).optional().describe("Padding in px or { x, y } adding to effective hit area"),
+      spacing: z.number().optional().describe("Perimeter spacing to nearest neighboring target in px"),
+      isInline: z.boolean().optional().describe("True if target is inline within a sentence (WCAG 2.5.8 exception)"),
+      isEssential: z.boolean().optional().describe("True if target dimensions are essential to functionality (e.g. map pin)"),
+    },
+  },
+  async ({ width, height, padding, spacing, isInline, isEssential }) => {
+    try {
+      return asText(auditTargetSize({ width, height, padding, spacing, isInline, isEssential }));
+    } catch (err) {
+      return asText({ ok: false, error: String(err?.message ?? err) });
+    }
+  }
+);
+
+server.registerTool(
+  "b0x_check_html",
+  {
+    title: "HTML / JSX accessibility and anti-pattern linter",
+    description:
+      "Fast static audit of HTML or JSX snippets or local component files. Catches unlabeled form inputs, unnamed icon buttons, clickable non-semantic divs, ambiguous links, missing image alt, invalid nesting, layout-thrash animations, and marketing filler copy.",
+    inputSchema: {
+      snippet: z.string().optional().describe("Raw HTML or JSX code string to analyze"),
+      filePath: z.string().optional().describe("Relative path to an HTML, JSX, TSX, or Vue file in the project"),
+    },
+  },
+  async ({ snippet, filePath }) => {
+    try {
+      let code = snippet;
+      if (!code && filePath) {
+        const proj = autoInit();
+        const fullPath = path.isAbsolute(filePath) ? filePath : path.join(proj.root || process.cwd(), filePath);
+        if (!fs.existsSync(fullPath)) {
+          return asText({ ok: false, error: `File not found: ${filePath}` });
+        }
+        code = fs.readFileSync(fullPath, "utf8");
+      }
+      if (!code) {
+        return asText({ ok: false, error: "Provide either a 'snippet' string or a 'filePath' relative to the project." });
+      }
+      return asText(auditHtml(code));
+    } catch (err) {
+      return asText({ ok: false, error: String(err?.message ?? err) });
+    }
+  }
+);
+
+server.registerTool(
+  "b0x_check_tokens",
+  {
+    title: "Design tokens and DTCG 2025.10 validator",
+    description:
+      "Validate a Design Tokens dictionary against DTCG 2025.10 ($value, $type, {alias} format) and multi-tier taxonomy (detects raw hex values leaked into component layers).",
+    inputSchema: {
+      tokens: z.record(z.any()).optional().describe("Parsed design tokens JSON object"),
+      filePath: z.string().optional().describe("Relative path to a tokens.json file in the project"),
+    },
+  },
+  async ({ tokens, filePath }) => {
+    try {
+      let data = tokens;
+      if (!data && filePath) {
+        const proj = autoInit();
+        const fullPath = path.isAbsolute(filePath) ? filePath : path.join(proj.root || process.cwd(), filePath);
+        if (!fs.existsSync(fullPath)) {
+          return asText({ ok: false, error: `File not found: ${filePath}` });
+        }
+        data = JSON.parse(fs.readFileSync(fullPath, "utf8"));
+      }
+      if (!data) {
+        return asText({ ok: false, error: "Provide either a 'tokens' object or a 'filePath' relative to the project." });
+      }
+      return asText(auditTokens(data));
+    } catch (err) {
+      return asText({ ok: false, error: String(err?.message ?? err) });
+    }
   }
 );
 const transport = new StdioServerTransport();

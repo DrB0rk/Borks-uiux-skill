@@ -1,9 +1,17 @@
 {
   "name": "b0rks-uiux-skill",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "B0rk's UI/UX SKILL: evidence-based UI/UX engineering, design systems, accessibility, validation and agent workflows.",
   "license": "MIT",
   "type": "module",
+  "bin": {
+    "b0x-audit": "./scripts/audit-ui.js"
+  },
+  "scripts": {
+    "audit": "node ./scripts/audit-ui.js",
+    "test": "node mcp/test/store.mjs",
+    "validate": "./scripts/validate.sh"
+  },
   "keywords": [
     "omp",
     "omp-plugin",
@@ -25,6 +33,7 @@
     "mcp/README.md",
     "scripts/install-mcp.sh",
     "scripts/validate.sh",
+    "scripts/audit-ui.js",
     "README.md",
     "LICENSE"
   ],

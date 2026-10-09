@@ -115,6 +115,38 @@ async function main() {
   console.log("  append past 60s-old lock:", afterLock.ok === true);
   console.log("  lock file removed      :", !fsp.existsSync(path.join(process.argv[2], ".b0x", ".lock")));
 
+  t("b0x_check_contrast");
+  const contrastSingle = JSON.parse(await call("b0x_check_contrast", { foreground: "#64748b", background: "#ffffff" }));
+  console.log("  single contrast ratio:", contrastSingle.contrastRatio, "| passes AA:", contrastSingle.standards.wcag_2_2_AA.pass);
+  const contrastPalette = JSON.parse(await call("b0x_check_contrast", {
+    palette: [
+      { foreground: "#0f172a", background: "#ffffff", role: "normal-text" },
+      { foreground: "#94a3b8", background: "#ffffff", role: "normal-text" },
+    ],
+  }));
+  console.log("  palette total:", contrastPalette.totalChecked, "| failing AA:", contrastPalette.failingAA, "| suggestion provided:", Boolean(contrastPalette.results[1].suggestion));
+
+  t("b0x_check_target");
+  const targetUndersized = JSON.parse(await call("b0x_check_target", { width: 16, height: 16 }));
+  console.log("  undersized pass WCAG:", targetUndersized.standards.wcag_2_2_AA_2_5_8.pass, "| recommendations:", targetUndersized.recommendations.length > 0);
+  const targetPadded = JSON.parse(await call("b0x_check_target", { width: 16, height: 16, padding: 14 }));
+  console.log("  padded to 44px pass WCAG:", targetPadded.standards.wcag_2_2_AA_2_5_8.pass, "| pass Apple:", targetPadded.standards.apple_hig.pass);
+
+  t("b0x_check_html");
+  const htmlAudit = JSON.parse(await call("b0x_check_html", {
+    snippet: '<button><svg></svg></button><input type="text"><a href="/x">click here</a><div onclick="foo()">Click</div>',
+  }));
+  console.log("  catches issues:", htmlAudit.totalIssues >= 4, "| critical count:", htmlAudit.summary.critical >= 3);
+
+  t("b0x_check_tokens");
+  const tokenAudit = JSON.parse(await call("b0x_check_tokens", {
+    tokens: {
+      color: { primary: { $value: "#2563eb", $type: "color" } },
+      button: { bg: { $value: "#2563eb", $type: "color" } },
+      spacing: { sm: { value: "4px" } },
+    },
+  }));
+  console.log("  catches legacy & component leaks:", tokenAudit.totalIssues >= 2, "| total tokens:", tokenAudit.totalTokens);
   await client.close();
 }
 
