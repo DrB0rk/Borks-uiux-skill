@@ -1,7 +1,7 @@
 {
   "name": "bizar-uiux-skill",
-  "version": "0.1.0",
-  "description": "UI/UX design and review skill for OMP — behavioural design principles, verified WCAG 2.2 targets, and AI-assisted UI quality review.",
+  "version": "0.2.0",
+  "description": "Research-backed UI/UX engineering skill for coding agents: intent, interaction patterns, design systems, WCAG 2.2, verification and authentic product UI.",
   "license": "MIT",
   "type": "module",
   "keywords": [
