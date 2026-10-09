@@ -4,7 +4,7 @@
 
 Standalone source distribution: https://github.com/DrB0rk/Borks-uiux-skill
 
-BizarHarness-OMP includes the skill by default so OMP can discover it from the installed package. The standalone repository is the intended canonical home for the reusable skill itself; Bizar's packaged copy must stay semantically aligned with it.
+This repository is the canonical source for B0rk's UI/UX SKILL. OMP-based hosts may bundle independent copies; host maintainers must explicitly sync the new skill identity and references when upgrading.
 
 ## How this skill is sourced
 
@@ -54,7 +54,7 @@ No numeric research finding should be restated in this skill unless the underlyi
 - Creator: Jon Yablonski
 - Scope consulted: the site's current law index and public explanatory pages.
 - The site states that its content is licensed under Creative Commons Attribution-NonCommercial-NoDerivatives 4.0.
-- Because BizarHarness-OMP is an independently licensed software package, keep this skill to independently worded summaries of general design/psychology principles and attribution. Do not copy the site's prose, examples, diagrams, posters, or branded graphics.
+- Because downstream OMP distributions may be independently licensed, keep this skill to independently worded summaries of general design/psychology principles and attribution. Do not copy the site's prose, examples, diagrams, posters, or branded graphics.
 
 Principles represented include aesthetic-usability effect, choice overload, chunking, cognitive load, Doherty threshold, Fitts's Law, flow, goal-gradient effect, Hick's Law, Jakob's Law, Gestalt grouping principles, mental models, working memory, active-user behavior, Pareto/Parkinson effects, peak-end rule, Postel-style robustness, selective attention, serial-position effects, Tesler's Law, isolation effect, and unfinished-task effects.
 

@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for improving `bizar-uiux`. This repo is the **canonical standalone source** for the skill that also ships inside [`@polderlabs/bizar-omp`](https://www.npmjs.com/package/@polderlabs/bizar-omp), so changes here should stay semantically aligned with that packaged copy.
+Thanks for improving `b0rks-uiux`. This repository is the canonical standalone source for B0rk's UI/UX SKILL. OMP-based hosts may embed their own copies; keep those aligned explicitly when updating.
 
 ## The bar for a good addition
 
@@ -17,10 +17,10 @@ If you cannot state the observable user consequence of your guidance, it is a pr
 
 | Change | File |
 |---|---|
-| New or revised design guidance | `skills/bizar-uiux/references/principles.md` |
-| New audit criteria | `skills/bizar-uiux/references/review-checklist.md` |
-| Priority order, severity rubric, output format | `skills/bizar-uiux/SKILL.md` |
-| Provenance / attribution | `skills/bizar-uiux/references/sources.md` |
+| New or revised design guidance | `skills/b0rks-uiux/references/principles.md` |
+| New audit criteria | `skills/b0rks-uiux/references/review-checklist.md` |
+| Priority order, severity rubric, output format | `skills/b0rks-uiux/SKILL.md` |
+| Provenance / attribution | `skills/b0rks-uiux/references/sources.md` |
 | Triggering behavior | `SKILL.md` frontmatter `description` |
 
 **Keep `SKILL.md` lean.** It loads in full whenever the skill triggers. Move anything that is only needed for a specific subtask into a reference file and link to it — that is the progressive disclosure the repo relies on to stay cheap in context.
@@ -48,8 +48,8 @@ The frontmatter `description` is the primary triggering mechanism. It should be 
 Confirm the structure and that the frontmatter parses:
 
 ```bash
-ls -R skills/bizar-uiux
-python3 -c "import yaml;print(yaml.safe_load(open('skills/bizar-uiux/SKILL.md'))['name'])"
+ls -R skills/b0rks-uiux
+python3 -c "import yaml;print(yaml.safe_load(open('skills/b0rks-uiux/SKILL.md'))['name'])"
 ```
 
 Rendering the banner:
