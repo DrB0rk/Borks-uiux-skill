@@ -13,15 +13,13 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod";
 import {
   KINDS,
+  append,
   autoInit,
-  ensure,
-  findProjectRoot,
   isInitialised,
   load,
   normalise,
+  remove,
   renderContext,
-  save,
-  appendLog,
 } from "./store.js";
 
 const server = new McpServer(
@@ -91,17 +89,22 @@ server.registerTool(
       const proj = autoInit();
       if (proj.available === false) return asText(notAvailable(proj) ?? "");
       const { root } = proj;
-      ensure(root);
       const entry = normalise({ kind, text, tags, source });
-      const entries = [...load(root), entry];
-      save(root, entries);
-      appendLog(root, { action: "record", id: entry.id, kind: entry.kind });
-      const context = renderContext(root, entries);
+      const { kept, dropped, droppedRejections } = append(root, entry);
+      const context = renderContext(root, kept);
       return asText({
         ok: true,
         recorded: entry,
-        total: entries.length,
-        hardConstraints: entries.filter((e) => e.kind === "rejection").length,
+        total: kept.length,
+        hardConstraints: kept.filter((e) => e.kind === "rejection").length,
+        // Never let trimming pass silently, and say loudly if a hard
+        // constraint was the thing that had to go.
+        ...(dropped
+          ? { trimmed: { dropped, droppedRejections,
+              warning: droppedRejections
+                ? "Hard rejections were dropped to stay under the 500-entry cap. Review with b0x_list."
+                : "Oldest preferences were pruned to stay under the 500-entry cap." } }
+          : {}),
         contextPreview: context.split("\n").slice(0, 12).join("\n"),
       });
     } catch (err) {
@@ -143,14 +146,9 @@ server.registerTool(
   async ({ id }) => {
     const proj = autoInit();
     if (proj.available === false) return asText(notAvailable(proj) ?? "");
-    const { root } = proj;
-    const entries = load(root);
-    const next = entries.filter((e) => e.id !== id);
-    if (next.length === entries.length) return asText({ ok: false, error: `No entry with id ${id}` });
-    save(root, next);
-    appendLog(root, { action: "forget", id });
-    renderContext(root, next);
-    return asText({ ok: true, removed: id, total: next.length });
+    const remaining = remove(proj.root, id);
+    if (remaining === null) return asText({ ok: false, error: `No entry with id ${id}` });
+    return asText({ ok: true, removed: id, total: remaining });
   }
 );
 

@@ -90,6 +90,14 @@ async function main() {
   const rec = JSON.parse(await call("b0x_record", { kind: "preference", text: "recovers after corruption" }));
   console.log("  accepts new writes again:", rec.ok === true);
 
+  t("stale lock does not wedge the store");
+  fsp.writeFileSync(path.join(process.argv[2], ".b0x", ".lock"), "");
+  const old = new Date(Date.now() - 60000);
+  fsp.utimesSync(path.join(process.argv[2], ".b0x", ".lock"), old, old);
+  const afterLock = JSON.parse(await call("b0x_record", { kind: "preference", text: "past a stale lock" }));
+  console.log("  append past 60s-old lock:", afterLock.ok === true);
+  console.log("  lock file removed      :", !fsp.existsSync(path.join(process.argv[2], ".b0x", ".lock")));
+
   await client.close();
 }
 

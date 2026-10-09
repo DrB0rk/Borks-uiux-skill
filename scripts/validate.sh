@@ -126,6 +126,34 @@ else
   bad "mcp/src/index.js missing"
 fi
 
+# 8. Run the test suites if dependencies are available
+if [[ -d mcp/node_modules/@modelcontextprotocol/sdk ]]; then
+  if [[ -f mcp/test/store.mjs ]]; then
+    if node mcp/test/store.mjs >/tmp/b0x-store-test.log 2>&1; then
+      ok "store unit tests pass ($(grep -c '  ok  ' /tmp/b0x-store-test.log) checks)"
+    else
+      bad "store unit tests failed:"; sed 's/^/        /' /tmp/b0x-store-test.log | tail -20
+    fi
+  else
+    printf '  \033[33mnote\033[0m  mcp/test/store.mjs absent, skipping unit tests\n'
+  fi
+
+  if [[ -f mcp/test/e2e.mjs ]]; then
+    proj="$(mktemp -d)"
+    ( cd "$proj" && git init -q . ) 2>/dev/null || true
+    if node mcp/test/e2e.mjs "$proj" >/tmp/b0x-e2e-test.log 2>&1; then
+      ok "mcp protocol e2e tests pass"
+    else
+      bad "mcp e2e tests failed:"; sed 's/^/        /' /tmp/b0x-e2e-test.log | tail -20
+    fi
+    rm -rf "$proj"
+  else
+    printf '  \033[33mnote\033[0m  mcp/test/e2e.mjs absent, skipping protocol tests\n'
+  fi
+else
+  printf '  \033[33mnote\033[0m  mcp dependencies absent, skipping test suites (run ./scripts/install-mcp.sh)\n'
+fi
+
 echo
 if [[ $fail -eq 0 ]]; then
   printf '\033[32mAll checks passed.\033[0m Safe to publish.\n'

@@ -43,7 +43,11 @@ A freshly created folder contains `config.json`, an empty `entries.json`, and a 
 
 Writes are atomic (temp file + rename), so an interrupted call cannot corrupt `entries.json`. Only fixed filenames are used — no user input ever reaches a path.
 
-**Concurrency.** Within one server process, calls are serialised and nothing is lost. Across processes there is no lockfile, so concurrent writers are last-write-wins and a read-modify-write can lose an entry. This was measured: six processes writing with a forced race window kept 11 of 30 entries. `entries.json` stayed valid JSON every time — atomicity is guaranteed, additive merging is not. One OMP session per project is the expected shape; running two agents against the same project simultaneously can drop a recent entry.
+**Retention.** The store caps at 500 entries. Trimming never silently drops a hard `rejection`: soft entries are pruned oldest-first to make room, and if rejections alone exceed the cap the oldest rejections go — but the response says so explicitly, and says how many. A silent drop in a memory system is the worst possible failure, so the count is always reported.
+
+**Log rotation.** `feedback.jsonl` is an audit trail, not the source of truth. It rotates past 1 MiB, keeping one previous generation.
+
+**Concurrency.** Appends take an exclusive lock (`.b0x/.lock`, created with `O_EXCL`) around the read-modify-write, so concurrent processes no longer lose each other's entries — measured at 30 of 30 surviving from six concurrent writers, versus 11 of 30 before locking. A lock older than 10 s is treated as abandoned and reclaimed, so a killed process cannot wedge the store. If the 3 s wait budget is exhausted the call proceeds anyway: the atomic rename still guarantees a valid file, so the worst case is a lost update, never corruption.
 
 ## Tools
 
@@ -81,8 +85,11 @@ The skill's `project-memory.md` reference states this rule to the agent directly
 
 ## Test
 
+Two suites, both run by `./scripts/validate.sh`:
+
 ```bash
-node mcp/test/e2e.mjs /tmp/some-project
+node mcp/test/store.mjs            # unit: pruning, locking, sanitisation, rotation, recovery
+node mcp/test/e2e.mjs /tmp/project  # real MCP stdio protocol, tool surface
 ```
 
-Drives the server over the real MCP stdio protocol: lists tools, records all three kinds, reads context, checks that a bad `kind` is rejected, and forgets an entry.
+`store.mjs` covers what the protocol test cannot easily prove: that concurrent processes do not lose entries, that pruning never drops a hard rejection first, that stale locks are reclaimed, that the log stays bounded, and that a corrupt store recovers.

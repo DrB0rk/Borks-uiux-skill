@@ -19,6 +19,7 @@
   "files": [
     "skills/",
     "mcp/src/",
+    "mcp/test/",
     "mcp/package.json",
     "mcp/bun.lock",
     "mcp/README.md",

@@ -19,6 +19,7 @@ export const SCHEMA = 1;
 const MAX_TEXT = 2000;
 const MAX_TAGS = 12;
 const MAX_ENTRIES = 500;
+const MAX_LOG_BYTES = 1024 * 1024; // 1 MiB before the audit log rotates
 
 export const KINDS = ["preference", "rejection", "praise"];
 
@@ -64,6 +65,61 @@ function readJson(file, fallback) {
     return JSON.parse(fs.readFileSync(file, "utf8"));
   } catch {
     return fallback;
+  }
+}
+
+/** Block the current thread briefly. Used only to retry a contended lock. */
+function sleepSync(ms) {
+  const sab = new SharedArrayBuffer(4);
+  Atomics.wait(new Int32Array(sab), 0, 0, ms);
+}
+
+const LOCK_STALE_MS = 10_000;
+const LOCK_WAIT_MS = 3_000;
+
+/**
+ * Serialise read-modify-write across processes.
+ *
+ * O_EXCL creation is atomic on every POSIX filesystem and Windows, so this
+ * works without native deps. A lock older than LOCK_STALE_MS is treated as
+ * abandoned and removed, so a killed process cannot wedge the store forever.
+ * If the wait budget is exhausted we proceed anyway rather than fail the call:
+ * the atomic rename still guarantees a valid file, so the worst case is the
+ * pre-existing last-write-wins, not corruption.
+ */
+export function withLock(root, fn) {
+  const dir = b0xDir(root);
+  fs.mkdirSync(dir, { recursive: true });
+  const lock = path.join(dir, ".lock");
+  const deadline = Date.now() + LOCK_WAIT_MS;
+
+  let fd = null;
+  for (;;) {
+    try {
+      fd = fs.openSync(lock, "wx");
+      break;
+    } catch (err) {
+      if (err.code !== "EEXIST") throw err;
+      try {
+        if (Date.now() - fs.statSync(lock).mtimeMs > LOCK_STALE_MS) {
+          fs.unlinkSync(lock);
+          continue;
+        }
+      } catch {
+        /* lock vanished between stat and unlink; retry immediately */
+      }
+      if (Date.now() > deadline) break; // give up waiting; still safe
+      sleepSync(5);
+    }
+  }
+
+  try {
+    return fn();
+  } finally {
+    if (fd !== null) {
+      try { fs.closeSync(fd); } catch { /* already gone */ }
+      try { fs.unlinkSync(lock); } catch { /* already released */ }
+    }
   }
 }
 
@@ -130,19 +186,95 @@ export function load(root) {
   return Array.isArray(entries) ? entries.filter((e) => e && typeof e.text === "string") : [];
 }
 
+/**
+ * Append an entry under the cross-process lock.
+ *
+ * This is the only correct way to add to the store: load, push and save must
+ * not be separated by anything, or a concurrent writer's changes are lost.
+ * Returns the prune report so callers can surface any trimming that happened.
+ */
+export function append(root, entry) {
+  return withLock(root, () => {
+    const report = save(root, [...load(root), entry]);
+    appendLog(root, { action: "record", id: entry.id, kind: entry.kind });
+    return report;
+  });
+}
+
+/** Remove by id under the lock, returning the remaining count or null. */
+export function remove(root, id) {
+  return withLock(root, () => {
+    const entries = load(root);
+    const next = entries.filter((e) => e.id !== id);
+    if (next.length === entries.length) return null;
+    save(root, next);
+    appendLog(root, { action: "forget", id });
+    renderContext(root, next);
+    return next.length;
+  });
+}
+
+/**
+ * Trim to the cap without ever silently dropping a hard rejection.
+ *
+ * Rejections are binding constraints; losing one silently would be the worst
+ * possible failure in a memory system. Soft entries are pruned oldest-first and
+ * rejections are kept for as long as possible. If rejections alone exceed the
+ * cap, the oldest are dropped and the caller is told, because that must not
+ * happen invisibly either.
+ */
+export function prune(entries, cap = MAX_ENTRIES) {
+  if (entries.length <= cap) return { kept: entries, dropped: 0, droppedRejections: 0 };
+
+  const rejections = entries.filter((e) => e.kind === "rejection");
+  const soft = entries.filter((e) => e.kind !== "rejection");
+
+  // Keep every rejection, plus the most recent soft entries that fit.
+  // `slice(-0)` is `slice(0)` in JavaScript and returns everything, so a zero
+  // budget must be handled explicitly rather than sliced.
+  const softBudget = Math.max(0, cap - rejections.length);
+  const keptSoft = softBudget > 0 ? soft.slice(-softBudget) : [];
+  const droppedSoft = soft.length - keptSoft.length;
+
+  let kept = [...keptSoft, ...rejections];
+  let droppedRejections = 0;
+  if (kept.length > cap) {
+    // Overwhelmingly rejections. Drop the oldest, but report it.
+    droppedRejections = kept.length - cap;
+    kept = kept.slice(-cap);
+  }
+
+  kept.sort((a, b) => String(a.created ?? "").localeCompare(String(b.created ?? "")));
+  return { kept, dropped: droppedSoft + droppedRejections, droppedRejections };
+}
+
 export function save(root, entries) {
   ensure(root);
-  const capped = entries.slice(-MAX_ENTRIES);
+  const { kept, dropped, droppedRejections } = prune(entries);
   writeAtomic(
     path.join(b0xDir(root), "entries.json"),
-    JSON.stringify(capped, null, 2) + "\n"
+    JSON.stringify(kept, null, 2) + "\n"
   );
+  return { kept, dropped, droppedRejections };
 }
 
 export function appendLog(root, event) {
   ensure(root);
+  const file = path.join(b0xDir(root), "feedback.jsonl");
   const line = JSON.stringify({ at: new Date().toISOString(), ...event }) + "\n";
-  fs.appendFileSync(path.join(b0xDir(root), "feedback.jsonl"), line, "utf8");
+  // Rotate past the cap, keeping one previous generation. A long-lived project
+  // would otherwise grow this without bound, and it is an audit trail rather
+  // than the source of truth - entries.json holds what actually matters.
+  try {
+    if (fs.statSync(file).size > MAX_LOG_BYTES) {
+      const prev = `${file}.1`;
+      try { fs.unlinkSync(prev); } catch { /* no previous rotation */ }
+      fs.renameSync(file, prev);
+    }
+  } catch {
+    /* no log yet */
+  }
+  fs.appendFileSync(file, line, "utf8");
 }
 
 export function normalise({ kind, text, tags, source }) {
