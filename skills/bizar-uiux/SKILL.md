@@ -17,6 +17,8 @@ Use this skill to turn interface work into explicit, testable design decisions i
 6. Check the proposal against accessibility, consistency, responsive behavior, error recovery, and implementation cost.
 7. Validate the final result against the task-specific checklist in [review-checklist.md](references/review-checklist.md).
 
+When a finding needs a threshold rather than an opinion, take the number from [standards-targets.md](references/standards-targets.md) instead of asserting what feels adequate. When reviewing agent-generated or visibly generic output, read [ai-assisted-ui.md](references/ai-assisted-ui.md).
+
 ## Design priorities
 
 Optimize in this order unless the task explicitly requires otherwise:
@@ -75,6 +77,15 @@ Classify findings by user impact, not visual preference:
 
 Do not report subjective style preferences as defects. Tie every finding to an observable user consequence.
 
+## Evidence and thresholds
+
+Prefer findings a reader can verify over findings that merely sound informed.
+
+- When a finding concerns size, contrast, reflow, timing, or target dimensions, cite the specific threshold and where it comes from rather than saying "too small" or "too slow".
+- Distinguish a normative requirement (a WCAG success criterion, a documented platform convention) from an internal engineering target and from a heuristic. They carry different weight, and conflating them misleads readers about how binding something is.
+- Do not restate quantitative research findings as established fact unless the underlying source supports the specific number. When evidence is a short abstract, a practitioner reflection, or observational commentary, say so and state the conclusion at the strength the evidence actually carries.
+- Accessibility thresholds are engineering guidance, not legal advice. Flag that distinction when a compliance question is in play.
+
 ## Output format for audits
 
 For each material finding provide:
@@ -84,6 +95,7 @@ For each material finding provide:
 - **Observed problem**
 - **User consequence**
 - **Relevant principle(s)**
+- **Threshold or evidence** (where a measurable basis applies)
 - **Recommended change**
 - **How to validate**
 
@@ -91,6 +103,14 @@ Prioritize a short list of high-impact fixes over a large inventory of weak obse
 
 ## Source and evidence discipline
 
-This skill is an original synthesis informed by Laws of UX and Laws of UI plus standard interaction-design practice. The source sites are reference material, not text to reproduce. Do not copy their article prose, examples, illustrations, or branded descriptions into deliverables.
+This skill is an original synthesis informed by Laws of UX and Laws of UI, established usability research, and normative accessibility and performance standards. The source sites are reference material, not text to reproduce. Do not copy their article prose, examples, illustrations, or branded descriptions into deliverables.
 
-Read [sources.md](references/sources.md) when provenance, attribution, or source scope matters. Read [principles.md](references/principles.md) for the full principle catalog. Read [review-checklist.md](references/review-checklist.md) when performing an audit or final implementation review.
+Treat sources in three tiers rather than as one undifferentiated body of evidence:
+
+- **Normative and official** — WCAG, WAI-ARIA, ISO, platform design guidance, government design systems, Core Web Vitals. These justify hard requirements and specific thresholds.
+- **Peer-reviewed empirical** — published conference and journal studies with stated methods. These support claims about how generated or designed interfaces actually behave.
+- **Established and observational** — long-running usability research organizations, plus practitioner commentary on emerging conventions. Useful for framing and corroboration; never sufficient alone to justify a hard requirement.
+
+When a heuristic is contradicted by product analytics, usability testing, accessibility requirements, platform conventions, or direct user research, prefer the stronger task-specific evidence.
+
+Read [sources.md](references/sources.md) for the full provenance, source verification status, and licensing rationale. Read [standards-targets.md](references/standards-targets.md) for verified thresholds. Read [principles.md](references/principles.md) for the principle catalog. Read [ai-assisted-ui.md](references/ai-assisted-ui.md) when reviewing agent-generated or homogenised interfaces. Read [review-checklist.md](references/review-checklist.md) when performing an audit or final implementation review.

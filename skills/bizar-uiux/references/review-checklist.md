@@ -58,14 +58,21 @@ Use only the sections relevant to the product and task. This is a review aid, no
 
 ## 8. Accessibility
 - Can all interactive controls be reached and used with keyboard alone?
-- Is focus visible?
+- Is focus visible, and never entirely hidden behind sticky headers or overlays?
+- Do dialogs return focus to their trigger on close, without creating traps?
+- Does focus order follow document order rather than CSS visual reordering?
 - Are accessible names, roles, states, headings, and landmarks appropriate?
+- Are native elements used for native actions (`<button>` for actions, `<a>` for navigation)?
+- Where ARIA is used, is the matching keyboard behaviour actually implemented?
 - Is color never the only carrier of meaning?
-- Is text/background and UI-component contrast adequate?
-- Does the interface survive 200%+ zoom/reflow where applicable?
-- Is meaningful motion reducible and non-essential?
-- Are touch targets and spacing usable for motor impairments?
-- Do validation and notifications work with assistive technology?
+- Does text/background contrast meet at least 4.5:1, and non-text UI contrast at least 3:1?
+- Do pointer targets meet at least 24 × 24 CSS px, and primary touch controls reach roughly 44–48?
+- Does content reflow to 320 CSS px without loss or two-dimensional scrolling?
+- Does the interface survive 200%+ zoom/reflow and user text-spacing overrides?
+- Are dynamic status messages programmatically determinable without moving focus?
+- Is meaningful motion reducible and non-essential, honouring `prefers-reduced-motion`?
+
+Thresholds and the caveats around them are in [standards-targets.md](standards-targets.md).
 
 ## 9. Responsive/mobile behavior
 - Does priority change appropriately on small screens instead of merely stacking everything?
@@ -95,7 +102,14 @@ Use only the sections relevant to the product and task. This is a review aid, no
 - Are errors specific, local, and actionable?
 - Does the system fail safely under latency, duplicate input, refresh, disconnect, or stale state?
 
-## 13. Review of implementation quality
+## 13. Performance as user experience
+- Is load and interaction performance measured rather than assumed, where tooling allows?
+- For web work, do LCP, INP, and CLS sit within the Core Web Vitals "good" thresholds?
+- Are images and fonts sized and prioritised so they do not drive layout shift?
+- Do route transitions and long tasks stay responsive?
+- Has decorative animation or blur been costed, and does speed work preserve needed feedback?
+
+## 14. Review of implementation quality
 - Does the implementation reuse existing design tokens/components?
 - Are one-off CSS values creating design drift?
 - Are semantic HTML and native controls used where suitable?
@@ -103,12 +117,26 @@ Use only the sections relevant to the product and task. This is a review aid, no
 - Do loading/error/empty states have actual code paths?
 - Are responsive and accessibility behaviors covered by tests or manual verification?
 
+## 15. Generic-default review
+Applies when reviewing generated or visibly generic interfaces. See [ai-assisted-ui.md](ai-assisted-ui.md) for the full rubric.
+
+- Were states designed beyond the happy path, or does the screen only render its default appearance?
+- Do page types that should differ (browse, edit, analyse, settings) share one generic composition?
+- Is content specific to this product, or would it fit almost any product unchanged?
+- Are styles drawn from semantic tokens, or do library defaults and per-page values accumulate?
+- Is responsive behaviour intentional, or does a desktop layout simply stack?
+- Could another company's logo be substituted without changing layout or content?
+- Is any decoration present without a product-specific reason?
+
+Do not infer AI authorship from visual style. Review lack of intent, not membership in a list of common design choices.
+
 ## Final prioritization
 
 Before reporting, ask:
 
 1. Which issue most blocks the user's goal?
-2. Which change removes the most friction for the most common path?
+2. Which change removes the most friction for the common path?
 3. Which issue creates the highest error/accessibility risk?
 4. Which recommendations can share one underlying fix?
-5. Which observations are merely stylistic preference and should be omitted?
+5. Which findings rest on a threshold or cited source rather than on taste?
+6. Which observations are merely stylistic preference and should be omitted?

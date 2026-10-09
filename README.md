@@ -37,6 +37,37 @@ Findings are graded by **user impact** — `Critical`, `High`, `Medium`, `Low` �
 
 ---
 
+## Backed by verified sources, not vibes
+
+Findings can carry a **threshold** instead of an opinion. Every number in this skill was checked against its primary source, and [`references/sources.md`](skills/bizar-uiux/references/sources.md) records the verification status of each citation individually.
+
+| Claim | Threshold |
+|---|---|
+| Normal text contrast | ≥ 4.5:1 |
+| Non-text / UI component contrast | ≥ 3:1 |
+| Pointer target minimum (WCAG 2.5.8) | 24 × 24 CSS px |
+| Primary touch target (internal target) | ~44–48 units |
+| Reflow (WCAG 1.4.10) | 320 CSS px, no two-dimensional scroll |
+| LCP / INP / CLS | ≤ 2.5 s · ≤ 200 ms · ≤ 0.1 (p75) |
+
+The skill also distinguishes a **normative requirement** from an **internal target** from a **heuristic** — they carry different weight, and conflating them misleads.
+
+Where the underlying research is weaker than it looks, the skill says so rather than laundering it into a fact. One frequently-cited figure was **deliberately left out**: its source is an extended abstract whose numbers couldn't be confirmed from primary material. The qualitative conclusion survives, because better-verified studies independently support it.
+
+---
+
+## Reviewing agent-generated UI
+
+`references/ai-assisted-ui.md` covers interfaces built with coding agents. Its stance is deliberately conservative:
+
+> There is no validated visual "AI detector." Don't infer authorship — ask whether the interface shows evidence of deliberate design and complete review.
+
+It distinguishes **consistency** (purposeful reuse within a product) from **homogenisation** (convergence toward the same generic answer across unrelated products), and supplies a 0–20 **generic-default risk rubric** across ten categories.
+
+It is also explicit about what *must never* be used as an accusation: a common font, Tailwind, shadcn/ui, Material, rounded cards, a purple gradient, dark mode, or a bento grid. The review target is **lack of intent, not style membership**.
+
+---
+
 ## What's inside
 
 ```
@@ -44,13 +75,15 @@ skills/bizar-uiux/
 ├── SKILL.md                      # Entry point: operating model, priorities, output format
 ├── references/
 │   ├── principles.md             # 40 principles mapped to concrete design guidance
-│   ├── review-checklist.md       # 13-section audit checklist
-│   └── sources.md                # Provenance and licensing discipline
+│   ├── review-checklist.md       # 15-section audit checklist
+│   ├── standards-targets.md      # Verified WCAG / performance thresholds
+│   ├── ai-assisted-ui.md         # Homogenisation signals, de-genericisation, risk rubric
+│   └── sources.md                # Provenance and per-source verification status
 └── agents/
     └── openai.yaml               # Display metadata for OpenAI-compatible hosts
 ```
 
-The layout is [progressive disclosure](https://en.wikipedia.org/wiki/Progressive_disclosure): only `SKILL.md` loads when the skill triggers, and the three reference files load only when the specific task needs them. Roughly **116 tokens** of frontmatter description sit in context at all times; a triggered load pulls in ~1.5k more, and the references add ~5k only when a task actually needs them.
+The layout is [progressive disclosure](https://en.wikipedia.org/wiki/Progressive_disclosure): only `SKILL.md` loads when the skill triggers, and the reference files load only when the specific task needs them. Roughly **116 tokens** of frontmatter description sit in context at all times; a triggered load pulls in ~2.0k more, and the references add more only when a task actually needs them.
 
 ---
 
@@ -114,6 +147,7 @@ Review src/components/DataTable.tsx for accessibility and responsive behavior.
 - **Observed problem** — the concrete evidence
 - **User consequence** — what it costs the user
 - **Relevant principle(s)** — the law being applied
+- **Threshold or evidence** — the measured basis, where one applies
 - **Recommended change** — the smallest fix
 - **How to validate** — how you confirm it worked
 
@@ -172,19 +206,20 @@ Each principle includes what it is, **when to use it**, and — importantly — 
 
 ---
 
-## The 13-section review checklist
+## The 15-section review checklist
 
 Used for audits and final implementation review:
 
 | # | Area | # | Area |
 |---|---|---|---|
-| 1 | Primary task & information architecture | 8 | Accessibility |
-| 2 | Decisions & cognitive load | 9 | Responsive / mobile behavior |
-| 3 | Actions & controls | 10 | Onboarding & discoverability |
-| 4 | Feedback & system state | 11 | Progress, completion & resumption |
-| 5 | Forms & input | 12 | Error prevention & recovery |
-| 6 | Visual hierarchy | 13 | Implementation quality |
-| 7 | Consistency & familiarity | | |
+| 1 | Primary task & information architecture | 9 | Responsive / mobile behavior |
+| 2 | Decisions & cognitive load | 10 | Onboarding & discoverability |
+| 3 | Actions & controls | 11 | Progress, completion & resumption |
+| 4 | Feedback & system state | 12 | Error prevention & recovery |
+| 5 | Forms & input | 13 | Performance as user experience |
+| 6 | Visual hierarchy | 14 | Implementation quality |
+| 7 | Consistency & familiarity | 15 | Generic-default review |
+| 8 | Accessibility | | |
 
 Only relevant sections are applied — the skill does not force findings into categories that don't apply to your product.
 
@@ -197,7 +232,7 @@ Improvements are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for the short v
 **Two things matter most:**
 
 1. **Keep it behavioral, not aesthetic.** New guidance must change a decision someone can observe, not a preference someone can argue.
-2. **Keep provenance honest.** See `skills/bizar-uiux/references/sources.md`.
+2. **Keep provenance honest.** Every citation in [`references/sources.md`](skills/bizar-uiux/references/sources.md) carries a verification status. If you add a source, verify it the same way — and if a number can't be confirmed from a primary source, say so instead of restating it.
 
 ---
 
@@ -211,4 +246,6 @@ The artwork in `assets/banner.svg` dogfoods the skill. It uses a clear typograph
 
 [MIT](LICENSE) © 2026 DrB0rk
 
-The skill is an original synthesis informed by [Laws of UX](https://lawsofux.com/) (Jon Yablonski) and [Laws of UI](https://www.uilaws.com/), plus standard interaction-design practice. No source prose, examples, illustrations, or branded assets are reproduced — see [`references/sources.md`](skills/bizar-uiux/references/sources.md) for the full provenance and licensing rationale.
+The skill is an original synthesis informed by [Laws of UX](https://lawsofux.com/) (Jon Yablonski) and [Laws of UI](https://www.uilaws.com/), plus established usability research, normative accessibility standards, and peer-reviewed research on AI-generated interfaces. No source prose, examples, illustrations, or branded assets are reproduced — see [`references/sources.md`](skills/bizar-uiux/references/sources.md) for the full provenance, per-source verification status, and licensing rationale.
+
+Accessibility content is engineering guidance, not legal advice.
