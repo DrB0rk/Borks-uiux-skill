@@ -13,6 +13,20 @@ Use this reference for microcopy, forms, dense tools, onboarding, consent, billi
 - Preserve user-entered work; never use a hostile "Something went wrong" dead end.
 - Design meaningful empty states: new user, zero matches, permission denied and connectivity failure require different guidance.
 
+### Every element earns its place
+
+Marketing-heavy, decorative or filler language is not a tone choice; it is a defect. Every word, label, and UI element must have a purpose that follows from the user's actual need, the state the screen is showing, or the downstream action it enables.
+
+Concrete rules:
+
+- **Cut adjectives and superlatives unless they communicate something specific.** "Streamline your workflow", "unlock insights", "powerful", "intuitive" — none of these tell a user what happens when they click.
+- **Replace abstract qualifiers with the concrete thing.** Instead of "experience seamless productivity", say what the button does: "Create project". Instead of "powerful analytics", name the chart and the unit: "Daily active users".
+- **Cut elements without a reason.** A decorative hero gradient with no information; a four-tile "feature" grid that duplicates the primary nav; a third CTA. If it does not serve a user task, a state, or a downstream action, remove it.
+- **Aesthetic does not excuse density, but density does not justify clutter either.** Both are easier than restraint.
+- **Never invent trust signals, customer counts, awards, testimonials, ratings, scarcity, urgency or social proof** to make a generated UI look finished. Fabricated trust signals are a more serious defect than bland copy.
+
+This is a default for copy and layout *together*. A perfectly written label on a redundant element is still redundant; a stripped layout with a single clear label is better than a polished one carrying three.
+
 ## Cognitive and neurodiversity-informed usability
 
 Consult [W3C Making Content Usable for People with Cognitive and Learning Disabilities](https://www.w3.org/TR/coga-usable/) (W3C Working Group Note, 29 April 2021). It is practical supporting guidance, **not** a normative WCAG success criterion checklist.
