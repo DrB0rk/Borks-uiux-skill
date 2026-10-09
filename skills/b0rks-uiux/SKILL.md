@@ -2,7 +2,7 @@
 name: b0rks-uiux
 description: Research, design, implement, audit, and validate UI/UX in web, mobile, and developer tools. Use for frontend coding, interface design, redesigns, responsive layouts, design systems and tokens, component interactions, agent/chat interfaces, forms, accessibility, content design, keyboard usability, interaction state modeling, performance, and AI-generated UI quality review. Produce evidence-backed fixes, complete states, and practical verification rather than generic visual polish.
 metadata:
-  version: 0.5.0
+  version: 0.6.0
 ---
 
 # B0rk's UI/UX SKILL
@@ -11,7 +11,7 @@ Use this skill to turn interface work into explicit, testable design decisions i
 
 ## Operating model
 
-0. If the `b0x_*` MCP tools are available, call `b0x_context` **before** proposing anything. This project's stored rejections and preferences outrank your defaults. Follow [project-memory.md](references/project-memory.md).
+0. If the `b0x_*` MCP tools are available, call `b0x_context` (optionally passing `role: "ui-engineer"`, `"ui-auditor"`, `"content-designer"`, `"motion-specialist"`, or `"accessibility-specialist"`) before proposing anything. The b0x repository provides global engineering roles and universal baseline constraints that govern all work, layered with any project-specific overrides. Follow [project-memory.md](references/project-memory.md).
 1. Identify the user's primary goal, context, device, and likely level of familiarity.
 2. Inspect the actual interface, flow, component tree, screenshots, code, or requirements before recommending changes.
 3. Find the highest-friction moments first: uncertainty, too many choices, poor target sizing, weak hierarchy, hidden state, long waits, unclear grouping, or broken conventions.

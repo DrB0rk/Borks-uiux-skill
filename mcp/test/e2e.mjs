@@ -24,6 +24,14 @@ async function main() {
   const { tools } = await client.listTools();
   for (const tool of tools) console.log(`  ${tool.name} — ${tool.description.slice(0, 72)}`);
 
+  t("b0x_roles (list all)");
+  const allRoles = JSON.parse(await call("b0x_roles"));
+  console.log(`  total roles: ${allRoles.totalRoles}`, allRoles.roles.map((r) => r.id).join(", "));
+
+  t("b0x_roles (inspect ui-engineer)");
+  const uiEng = JSON.parse(await call("b0x_roles", { role: "ui-engineer" }));
+  console.log(`  title: ${uiEng.title} | directives: ${uiEng.directives.length}`);
+
   t("b0x_status (fresh project)");
   console.log("  " + (await call("b0x_status")).replace(/\n/g, "\n  "));
 
@@ -44,12 +52,19 @@ async function main() {
   await call("b0x_record", { kind: "preference", text: "One primary CTA per view" });
   await call("b0x_record", { kind: "praise", text: "Compact settings list spacing" });
 
-  t("b0x_list kind=rejection");
-  const listed = JSON.parse(await call("b0x_list", { kind: "rejection" }));
-  console.log(`  total=${listed.total}`, JSON.stringify(listed.entries[0]).slice(0, 110));
+  t("b0x_list scope=all kind=rejection");
+  const listedAll = JSON.parse(await call("b0x_list", { kind: "rejection", scope: "all" }));
+  console.log(`  total=${listedAll.total} (includes global baseline + project)`);
 
-  t("b0x_context");
-  console.log((await call("b0x_context")).split("\n").slice(0, 16).map((l) => "  " + l).join("\n"));
+  t("b0x_list scope=project");
+  const listedProj = JSON.parse(await call("b0x_list", { scope: "project" }));
+  console.log(`  project total=${listedProj.total}`);
+
+  t("b0x_context with role spotlight");
+  const ctxSpotlight = await call("b0x_context", { role: "content-designer" });
+  console.log("  spotlight present:", ctxSpotlight.includes("Active role focus: Content Designer"));
+  console.log("  global baseline present:", ctxSpotlight.includes("Global baseline hard rejections"));
+  console.log("  project overrides present:", ctxSpotlight.includes("Project-specific memory"));
 
   t("schema rejects bad kind at the protocol layer");
   const bad = await client.callTool({ name: "b0x_record", arguments: { kind: "nonsense", text: "x" } });
@@ -79,16 +94,18 @@ async function main() {
   console.log("  emoji/CJK/RTL preserved:", /\u{1F3A8}/u.test(uni) && /配色/.test(uni) && /نظام/.test(uni));
 
   t("b0x_forget");
-  const first = JSON.parse(await call("b0x_list")).entries[0];
+  const first = JSON.parse(await call("b0x_list", { scope: "project" })).entries[0];
   console.log("  " + (await call("b0x_forget", { id: first.id })).replace(/\n/g, " "));
 
-  // Runs last: this destroys the store, so anything after it has nothing to read.
+  // Runs last: this destroys the local store, so anything after it has nothing to read.
   t("corrupt entries.json is survived");
   fsp.writeFileSync(path.join(process.argv[2], ".b0x", "entries.json"), "{ not json at all");
-  const after = JSON.parse(await call("b0x_list"));
-  console.log("  reads cleanly, no crash:", after.total === 0);
+  const afterProj = JSON.parse(await call("b0x_list", { scope: "project" }));
+  const afterAll = JSON.parse(await call("b0x_list", { scope: "all" }));
+  console.log("  project reads cleanly after corruption (empty):", afterProj.total === 0);
+  console.log("  global baseline rules survive corruption     :", afterAll.total >= 13);
   const rec = JSON.parse(await call("b0x_record", { kind: "preference", text: "recovers after corruption" }));
-  console.log("  accepts new writes again:", rec.ok === true);
+  console.log("  accepts new writes again                      :", rec.ok === true);
 
   t("stale lock does not wedge the store");
   fsp.writeFileSync(path.join(process.argv[2], ".b0x", ".lock"), "");

@@ -1,8 +1,22 @@
-# b0x — per-project design memory (MCP server)
+# b0x — global roles & per-project design memory (MCP server)
 
-Gives the `b0rks-uiux` skill a memory that changes per project. The user rejects things in one repo that they want in another; this remembers the difference.
+Ships **global UI/UX engineering roles and universal baseline rules** directly from the b0x repository (`mcp/src/global-roles.json`), layered with **per-project design memory** in `.b0x/`.
 
 Local only. Nothing is sent anywhere.
+
+## Global repository roles & baseline constraints
+
+Shipped in the repository and active across all projects automatically:
+
+| Role ID | Title | Core scope |
+|---|---|---|
+| `ui-engineer` | UI Engineer (Implementation & Primitives) | Clean DOM semantics, native HTML controls, Lucide icons, no competing active accent rails, purposeful elements |
+| `ui-auditor` | UI Auditor (Interface Review & Quality Gate) | Objective user consequences, measurable WCAG/performance thresholds, state completeness, resisting generic AI defaults |
+| `content-designer` | Content Designer (Microcopy, Clarity & Ethics) | Actionable error recovery, concrete copy, cutting marketing filler language, no fake trust signals or artificial urgency |
+| `motion-specialist` | Motion Specialist (Transitions, Morphing & Effects) | CSS transitions first, FLIP/GSAP for state morphing, compositor-only transforms, box-shadow vs drop-shadow, prefers-reduced-motion |
+| `accessibility-specialist` | Accessibility Specialist (WCAG 2.2 AA & Input Ergonomics) | Non-negotiable WCAG 2.2 AA baseline, visible focus rings, complete keyboard navigation, 24x24 px / 44-48 px touch targets |
+
+Universal baseline rejections (never hand-author SVG icons / use Lucide, no marketing filler language, no active accent rails on selected cards, GSAP licence terms, no treating taste as defects, no fake trust signals) are always active. Project-level `.b0x/` stores local overrides and additions.
 
 ## Install
 
@@ -53,14 +67,14 @@ Writes are atomic (temp file + rename), so an interrupted call cannot corrupt `e
 
 | Tool | Purpose |
 |---|---|
-| `b0x_status` | Does this project have memory? Counts by kind. |
-| `b0x_context` | The snapshot to follow before designing. **Call first.** |
-| `b0x_record` | Store durable feedback |
-| `b0x_list` | Inspect entries, filter by kind |
+| `b0x_roles` | Inspect or list global roles (`ui-engineer`, `ui-auditor`, `content-designer`, `motion-specialist`, `accessibility-specialist`) |
+| `b0x_status` | Global repository roles/baseline status and project memory counts |
+| `b0x_context` | The unified snapshot to follow before designing. Supports optional `{ role }` spotlight. **Call first.** |
+| `b0x_record` | Store durable feedback (`scope: "project"` or `scope: "global"`) |
+| `b0x_list` | Inspect entries, with `kind` and `scope` filters (`all`, `global`, `project`) |
 | `b0x_forget` | Remove or supersede an entry by id |
 
-`b0x_record` takes `kind` ∈ `rejection` (hard) | `preference` (soft) | `praise` (confirmed working), plus `text` (≤2000 chars, clamped) and optional `tags`.
-
+`b0x_record` takes `kind` ∈ `rejection` (hard) | `preference` (soft) | `praise` (confirmed working), `text` (≤2000 chars, clamped), optional `tags`, and optional `scope` (`project` for local `.b0x/` [default], or `global` for user `~/.b0x/`).
 Input validation happens at the schema layer: an invalid `kind` comes back as an MCP `isError` result naming the allowed values, before any file is touched.
 
 Stored text is sanitised on the way in. C0/C1 control characters are stripped — an entry carrying an ANSI escape would otherwise repaint or reposition the terminal that renders it — while newline, carriage return and tab are preserved. Text is clamped to 2000 characters and tags to 40, truncating rather than silently discarding them.

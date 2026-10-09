@@ -98,12 +98,18 @@ Where the underlying research is weaker than it looks, the skill says so rather 
 
 ---
 
-## Per-project memory
+## Global roles & project memory
 
-A skill that applies one fixed house style everywhere is wrong half the time. You reject a pattern in one project and want it in another — this skill can remember the difference.
+The b0x MCP server ships **global UI/UX engineering roles and universal baseline rules** directly from the b0x repository (`mcp/src/global-roles.json`), layered with **per-project design memory** in `.b0x/`.
 
-The `b0x` MCP server stores durable design feedback in a `.b0x/` folder at the project root. Nothing leaves your machine.
+Out of the box, five global roles are available across every project:
+- **`ui-engineer`**: implementation, clean DOM semantics, Lucide icons, no competing active accent rails
+- **`ui-auditor`**: interface review, measurable WCAG/performance thresholds, state completeness
+- **`content-designer`**: microcopy clarity, actionable errors, cutting marketing filler language
+- **`motion-specialist`**: CSS transitions first, FLIP/GSAP for state morphing, compositor-only transforms
+- **`accessibility-specialist`**: WCAG 2.2 AA baseline, visible focus rings, complete keyboard navigation
 
+Universal baseline rejections (never hand-author SVG icons / use Lucide, no marketing filler language, no active accent rails on selected cards, GSAP licence terms, no treating taste as defects, no fake trust signals) apply across all projects. Local `.b0x/` stores project-specific overrides.
 ```bash
 ./scripts/install-mcp.sh    # registers with OMP; merge-safe, reversible
 ```
@@ -231,7 +237,7 @@ Verify it registered:
 
 ```bash
 omp plugin list
-# ● b0rks-uiux-skill@0.5.0
+# ● b0rks-uiux-skill@0.6.0
 ```
 
 Restart OMP after installation. The skill is then available as `b0rks-uiux`. Hosts bundling older copies must migrate explicitly — `b0rks-uiux` is a new identifier, not a backward-compatible alias for `bizar-uiux`.

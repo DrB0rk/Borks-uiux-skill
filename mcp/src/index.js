@@ -15,19 +15,25 @@ import {
   KINDS,
   append,
   autoInit,
+  getGlobalBaseline,
+  getGlobalRoles,
+  getRole,
+  getUserGlobalDir,
   isInitialised,
   load,
+  loadMerged,
+  loadUserGlobal,
   normalise,
   remove,
   renderContext,
 } from "./store.js";
 
 const server = new McpServer(
-  { name: "b0x", version: "0.1.0" },
+  { name: "b0x", version: "0.2.0" },
   {
     capabilities: { tools: {} },
     instructions:
-      "Per-project design memory for B0rk's UI/UX skill. Call b0x_context before doing UI/UX work in a project to read the user's stored rejections and preferences. Record durable feedback with b0x_record. Only record what the user actually said; do not invent preferences.",
+      "Global design roles & project memory for B0rk's UI/UX skill. Call b0x_context before doing UI/UX work in a project to read global repository baseline constraints and local project overrides. Inspect or spotlight roles with b0x_roles. Record durable feedback with b0x_record.",
   }
 );
 
@@ -44,29 +50,89 @@ const UNAVAILABLE =
 const notAvailable = ({ reason }) => reason === "disabled" ? null : UNAVAILABLE;
 
 server.registerTool(
+  "b0x_roles",
+  {
+    title: "Global UI/UX repository roles",
+    description:
+      "Inspect global UI/UX engineering roles shipped in the b0x repository (ui-engineer, ui-auditor, content-designer, motion-specialist, accessibility-specialist). Omit role parameter to list all available roles.",
+    inputSchema: {
+      role: z
+        .string()
+        .optional()
+        .describe(
+          "Role identifier to inspect: 'ui-engineer', 'ui-auditor', 'content-designer', 'motion-specialist', or 'accessibility-specialist'."
+        ),
+    },
+  },
+  async ({ role } = {}) => {
+    const roles = getGlobalRoles();
+    if (role) {
+      const found = roles[role.trim().toLowerCase()];
+      if (!found) {
+        return asText({
+          ok: false,
+          error: `Unknown role '${role}'. Available global roles: ${Object.keys(roles).join(", ")}`,
+        });
+      }
+      return asText({
+        ok: true,
+        role: role.trim().toLowerCase(),
+        title: found.title,
+        charter: found.charter,
+        directives: found.directives,
+      });
+    }
+    return asText({
+      repository: "b0x (global repository roles)",
+      totalRoles: Object.keys(roles).length,
+      roles: Object.entries(roles).map(([id, r]) => ({
+        id,
+        title: r.title,
+        charter: r.charter,
+      })),
+      hint: "Call b0x_roles with a specific role name to inspect its full directives, or call b0x_context({ role: '...' }) to spotlight that role.",
+    });
+  }
+);
+
+server.registerTool(
   "b0x_status",
   {
-    title: "Project memory status",
+    title: "Project memory & global roles status",
     description:
-      "Check whether this project has a .b0x memory folder and how much is stored. Use this to decide whether to initialise or read memory.",
+      "Check global repository roles/baseline status and whether this project has a .b0x memory folder with local entries.",
     inputSchema: {},
   },
   async () => {
-    const { root, created, reason } = autoInit();
-    const entries = load(root);
+    const { root, created, reason, available } = autoInit();
+    const entries = available === false || !root || !isInitialised(root) ? [] : load(root);
     const counts = Object.fromEntries(KINDS.map((k) => [k, entries.filter((e) => e.kind === k).length]));
+    const globalRoles = getGlobalRoles();
+    const globalBaseline = getGlobalBaseline();
+    const userGlobal = loadUserGlobal();
     return asText({
-      projectRoot: root,
-      project: root.split("/").pop(),
-      initialised: isInitialised(root),
-      createdNow: Boolean(created),
-      ...(reason ? { autoInitSkipped: reason } : {}),
-      b0xPath: `${root}/.b0x`,
-      total: entries.length,
-      counts,
-      hint: entries.length
-        ? "Call b0x_context and honour hard rejections before doing UI/UX work."
-        : "Memory is ready but empty. Call b0x_record when the user gives durable design feedback.",
+      globalRepository: {
+        source: "b0x repository (global-roles.json)",
+        roles: Object.keys(globalRoles),
+        rolesCount: Object.keys(globalRoles).length,
+        baselineRejections: globalBaseline.rejections?.length || 0,
+        baselinePreferences: globalBaseline.preferences?.length || 0,
+      },
+      userGlobal: {
+        path: getUserGlobalDir(),
+        entriesCount: userGlobal.length,
+      },
+      project: {
+        projectRoot: root,
+        project: root ? root.split("/").pop() : null,
+        initialised: root ? isInitialised(root) : false,
+        createdNow: Boolean(created),
+        ...(reason ? { autoInitSkipped: reason } : {}),
+        b0xPath: root ? `${root}/.b0x` : null,
+        localEntriesCount: entries.length,
+        localCounts: counts,
+      },
+      hint: "Global repository roles & baseline constraints apply across all projects. Project .b0x provides local overrides.",
     });
   }
 );
@@ -76,35 +142,48 @@ server.registerTool(
   {
     title: "Record design feedback",
     description:
-      "Remember durable design feedback for this project. kind='rejection' is a HARD constraint (never do this); kind='preference' is a soft default; kind='praise' confirms something that worked. Only record what the user actually said - never infer or invent preferences.",
+      "Remember durable design feedback. kind='rejection' is a HARD constraint; kind='preference' is a soft default; kind='praise' confirms something that worked. Supports scope='project' (local .b0x, default) or scope='global' (user-level ~/.b0x).",
     inputSchema: {
       kind: z.enum(KINDS).describe("rejection = hard 'never do this'; preference = soft default; praise = confirmed good"),
-      text: z.string().min(1).max(2000).describe("The rule itself, stated as a directive. e.g. 'No coloured left border on cards'"),
-      tags: z.array(z.string()).max(12).optional().describe("Optional lowercase tags, e.g. ['border','navigation']"),
-      source: z.string().optional().describe("Where the feedback came from, e.g. 'user correction 2026-10-09'"),
+      text: z.string().min(1).max(2000).describe("The rule itself, stated as a directive."),
+      tags: z.array(z.string()).max(12).optional().describe("Optional lowercase tags"),
+      source: z.string().optional().describe("Where the feedback came from"),
+      scope: z
+        .enum(["project", "global"])
+        .optional()
+        .describe("Storage scope: 'project' (default, saves in project .b0x/) or 'global' (saves in user global ~/.b0x/)"),
     },
   },
-  async ({ kind, text, tags, source }) => {
+  async ({ kind, text, tags, source, scope = "project" }) => {
     try {
-      const proj = autoInit();
-      if (proj.available === false) return asText(notAvailable(proj) ?? "");
-      const { root } = proj;
+      let targetRoot;
+      if (scope === "global") {
+        targetRoot = getUserGlobalDir();
+      } else {
+        const proj = autoInit();
+        if (proj.available === false) return asText(notAvailable(proj) ?? "");
+        targetRoot = proj.root;
+      }
       const entry = normalise({ kind, text, tags, source });
-      const { kept, dropped, droppedRejections, context } = append(root, entry);
+      const { kept, dropped, droppedRejections, context } = append(targetRoot, entry);
       return asText({
         ok: true,
+        scope,
         recorded: entry,
         total: kept.length,
         hardConstraints: kept.filter((e) => e.kind === "rejection").length,
-        // Never let trimming pass silently, and say loudly if a hard
-        // constraint was the thing that had to go.
         ...(dropped
-          ? { trimmed: { dropped, droppedRejections,
-              warning: droppedRejections
-                ? "Hard rejections were dropped to stay under the 500-entry cap. Review with b0x_list."
-                : "Oldest preferences were pruned to stay under the 500-entry cap." } }
+          ? {
+              trimmed: {
+                dropped,
+                droppedRejections,
+                warning: droppedRejections
+                  ? "Hard rejections were dropped to stay under the 500-entry cap. Review with b0x_list."
+                  : "Oldest preferences were pruned to stay under the 500-entry cap.",
+              },
+            }
           : {}),
-        contextPreview: context.split("\n").slice(0, 12).join("\n"),
+        contextPreview: context.split("\n").slice(0, 14).join("\n"),
       });
     } catch (err) {
       return asText({ ok: false, error: String(err?.message ?? err) });
@@ -116,19 +195,37 @@ server.registerTool(
   "b0x_list",
   {
     title: "List stored design memory",
-    description: "List remembered entries for this project, optionally filtered by kind.",
+    description: "List remembered entries, with optional scope and kind filters.",
     inputSchema: {
       kind: z.enum(KINDS).optional().describe("Filter by kind; omit for all"),
+      scope: z
+        .enum(["all", "global", "project"])
+        .optional()
+        .describe("Filter scope: 'global' (repo baseline + user global), 'project' (local .b0x only), or 'all' (merged, default)"),
       limit: z.number().int().min(1).max(500).optional().describe("Max entries to return (default 50)"),
     },
   },
-  async ({ kind, limit = 50 }) => {
+  async ({ kind, scope = "all", limit = 50 }) => {
     const proj = autoInit();
-    if (proj.available === false) return asText(notAvailable(proj) ?? "");
-    const { root } = proj;
-    const entries = load(root).filter((e) => !kind || e.kind === kind);
+    const root = proj.available === false ? null : proj.root;
+    const merged = loadMerged(root);
+
+    let entries = [];
+    if (scope === "global") {
+      entries = [...merged.globalRepo.rejections, ...merged.globalRepo.preferences, ...merged.globalUser];
+    } else if (scope === "project") {
+      entries = [...merged.project];
+    } else {
+      entries = merged.all;
+    }
+
+    if (kind) {
+      entries = entries.filter((e) => e.kind === kind);
+    }
+
     return asText({
       projectRoot: root,
+      scope,
       total: entries.length,
       entries: entries.slice(-limit).reverse(),
     });
@@ -154,25 +251,23 @@ server.registerTool(
 server.registerTool(
   "b0x_context",
   {
-    title: "Read project design memory",
+    title: "Read design memory & global roles",
     description:
-      "Return the compact memory snapshot to follow for this project: hard rejections first, then preferences, then confirmed patterns. Call this BEFORE doing UI/UX work.",
-    inputSchema: {},
+      "Return the unified memory snapshot: global repository baseline rules and roles, layered with local project overrides. Call this BEFORE doing UI/UX work.",
+    inputSchema: {
+      role: z
+        .string()
+        .optional()
+        .describe("Optional role to focus/spotlight in context: 'ui-engineer', 'ui-auditor', 'content-designer', 'motion-specialist', 'accessibility-specialist'"),
+    },
   },
-  async () => {
+  async ({ role } = {}) => {
     const proj = autoInit();
-    if (proj.available === false) return asText(notAvailable(proj) ?? "");
-    const { root } = proj;
-    if (!isInitialised(root)) {
-      return asText(
-        "# Project design memory\n\n_No .b0x memory for this project yet._\n\nCall `b0x_record` when the user gives durable design feedback."
-      );
-    }
-    const entries = load(root);
-    return asText(renderContext(root, entries));
+    const root = proj.available === false ? null : proj.root;
+    const entries = root && isInitialised(root) ? load(root) : [];
+    return asText(renderContext(root, entries, role));
   }
 );
-
 const transport = new StdioServerTransport();
 await server.connect(transport);
 
