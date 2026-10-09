@@ -1,8 +1,6 @@
 ---
 name: bizar-uiux
-description: Design, review, and improve user interfaces and user experiences using a practical synthesis of established UX psychology and UI composition principles. Use for UI/UX audits, redesigns, component design, interaction flows, onboarding, navigation, forms, dashboards, responsive layouts, accessibility-oriented interface review, visual hierarchy, information architecture, conversion/decision flows, and frontend implementation where user experience quality matters.
-metadata:
-  version: 0.1.0
+description: Research, design, implement, audit, and validate UI/UX in web, mobile, and developer tools. Use for frontend coding, interface design, redesigns, responsive layouts, design systems and tokens, component interactions, agent/chat interfaces, forms, accessibility, content design, keyboard usability, interaction state modeling, performance, and AI-generated UI quality review. Produce evidence-backed fixes, complete states, and practical verification rather than generic visual polish.
 ---
 
 # Bizar UI/UX
@@ -19,6 +17,8 @@ Use this skill to turn interface work into explicit, testable design decisions i
 6. Check the proposal against accessibility, consistency, responsive behavior, error recovery, and implementation cost.
 7. Validate the final result against the task-specific checklist in [review-checklist.md](references/review-checklist.md).
 
+For design or implementation tasks, follow [agent-workflow.md](references/agent-workflow.md), using its intent contract, state model, design envelope and explicit verification reporting. For real controls consult [interaction-patterns.md](references/interaction-patterns.md). For visual-system or responsive changes consult [design-systems.md](references/design-systems.md). For content, consent, permission or cognitive clarity consult [content-trust-ethics.md](references/content-trust-ethics.md). For QA and testing consult [evaluation-playbook.md](references/evaluation-playbook.md). These are selectively loaded task guides, not mandatory reading for every trivial request.
+
 When a finding needs a threshold rather than an opinion, take the number from [standards-targets.md](references/standards-targets.md) instead of asserting what feels adequate. When reviewing agent-generated or visibly generic output, read [ai-assisted-ui.md](references/ai-assisted-ui.md).
 
 ## Design priorities
@@ -29,7 +29,7 @@ Optimize in this order unless the task explicitly requires otherwise:
 2. **Clarity:** Are hierarchy, grouping, states, labels, and choices obvious?
 3. **Efficiency:** Is the common path short, responsive, and low-effort?
 4. **Error resistance:** Are destructive actions, invalid input, and ambiguous states handled safely?
-5. **Accessibility:** Does the design remain usable with keyboard, assistive technology, low vision, motion sensitivity, zoom, and small screens?
+5. **Accessibility (non-negotiable gate):** Does the design remain usable with keyboard, assistive technology, low vision, motion sensitivity, zoom, and small screens? Never trade this away to optimize an earlier priority.
 6. **Consistency and familiarity:** Does it follow established platform and product conventions unless deviation has a measurable benefit?
 7. **Aesthetics:** Does visual polish reinforce hierarchy and trust rather than obscure function?
 
@@ -116,3 +116,25 @@ Treat sources in three tiers rather than as one undifferentiated body of evidenc
 When a heuristic is contradicted by product analytics, usability testing, accessibility requirements, platform conventions, or direct user research, prefer the stronger task-specific evidence.
 
 Read [sources.md](references/sources.md) for the full provenance, source verification status, and licensing rationale. Read [standards-targets.md](references/standards-targets.md) for verified thresholds. Read [principles.md](references/principles.md) for the principle catalog. Read [ai-assisted-ui.md](references/ai-assisted-ui.md) when reviewing agent-generated or homogenised interfaces. Read [review-checklist.md](references/review-checklist.md) when performing an audit or final implementation review.
+
+## Evidence-backed autonomous work
+
+- Before modifying a repository, inspect existing screens, tokens, components and domain vocabulary. Never replace the design system with a generic template without a task-specific reason.
+- For new screens or significant redesigns, document user task, primary action, state transitions, responsive behavior, keyboard semantics, data truth and acceptance tests before writing code. For a small repair, use the narrowest relevant subset.
+- Treat **implemented**, **builds**, **test passes**, **visually inspected**, **assistive-tech checked**, **field measured** and **user validated** as distinct claims. Run real checks where possible; label unavailable checks explicitly. A static mockup cannot verify interaction.
+- Maintain a two-pass quality gate: correctness/behavior/accessibility first; density/hierarchy/token coherence/domain character second. Avoid endless decorative iteration.
+- For coding-agent interfaces, model model/effort/permission selection, tool approvals, execution states, session/host identity, background jobs and composer draft retention. Never imply completion merely because text streams.
+- An internal rubric or heuristic is not a published standard. Never derive legal-compliance conclusions solely from this skill.
+
+## Expanded reference map
+
+| Work | Load only when relevant |
+|---|---|
+| Repository implementation or autonomous audit | [agent-workflow.md](references/agent-workflow.md) |
+| Dialogs, menus, tabs, chat composers, forms, async controls | [interaction-patterns.md](references/interaction-patterns.md) |
+| Tokens, typography, themes, grids, responsive layouts, localization | [design-systems.md](references/design-systems.md) |
+| QA, accessibility tooling, viewport/state checks, real user tasks | [evaluation-playbook.md](references/evaluation-playbook.md) |
+| UX writing, trust, consent, neuroinclusive design and permissions | [content-trust-ethics.md](references/content-trust-ethics.md) |
+| Primary references and specific evidence status | [research-addendum-2026.md](references/research-addendum-2026.md) and [sources.md](references/sources.md) |
+
+WCAG 2.2 Focus Appearance (2.4.13) is **Level AAA**; do not include it as an AA conformance criterion. Aim for a strong visible focus treatment without misstating its normative level.
