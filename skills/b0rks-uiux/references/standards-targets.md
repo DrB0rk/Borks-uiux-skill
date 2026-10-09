@@ -18,7 +18,7 @@ Do not turn every threshold into a compliance audit. Apply the ones relevant to 
 
 WCAG 2.2 added criteria directly relevant to everyday interface work: Focus Not Obscured, Dragging Movements, Target Size (Minimum), Consistent Help, Redundant Entry, and Accessible Authentication.
 
-#Focus Appearance (SC 2.4.13) is **Level AAA**, not part of the Level AA baseline. Its design guidance is useful as a stretch goal, but must not be cited as mandatory for AA. See [research-addendum-2026.md](research-addendum-2026.md).
+Focus Appearance (SC 2.4.13) is **Level AAA**, not part of the Level AA baseline. Its design guidance is useful as a stretch goal, but must not be cited as mandatory for AA. See [research-addendum-2026.md](research-addendum-2026.md).
 
 ## Verified thresholds
 

@@ -19,11 +19,19 @@ If you cannot state the observable user consequence of your guidance, it is a pr
 |---|---|
 | New or revised design guidance | `skills/b0rks-uiux/references/principles.md` |
 | New audit criteria | `skills/b0rks-uiux/references/review-checklist.md` |
+| Numeric thresholds (WCAG, performance, targets) | `skills/b0rks-uiux/references/standards-targets.md` |
+| Agent-generated / homogenised UI review | `skills/b0rks-uiux/references/ai-assisted-ui.md` |
+| Implementation workflow, state models, envelopes | `skills/b0rks-uiux/references/agent-workflow.md` |
+| Concrete control behaviour and keyboard patterns | `skills/b0rks-uiux/references/interaction-patterns.md` |
+| Tokens, visual system, responsive rules | `skills/b0rks-uiux/references/design-systems.md` |
+| Content, consent, permission, cognitive clarity | `skills/b0rks-uiux/references/content-trust-ethics.md` |
+| QA strategy and verification sequencing | `skills/b0rks-uiux/references/evaluation-playbook.md` |
+| Standards provenance and 2026 source map | `skills/b0rks-uiux/references/research-addendum-2026.md` |
+| Provenance / attribution / verification status | `skills/b0rks-uiux/references/sources.md` |
 | Priority order, severity rubric, output format | `skills/b0rks-uiux/SKILL.md` |
-| Provenance / attribution | `skills/b0rks-uiux/references/sources.md` |
 | Triggering behavior | `SKILL.md` frontmatter `description` |
 
-**Keep `SKILL.md` lean.** It loads in full whenever the skill triggers. Move anything that is only needed for a specific subtask into a reference file and link to it — that is the progressive disclosure the repo relies on to stay cheap in context.
+**Keep `SKILL.md` lean.** It loads in full whenever the skill triggers. Move anything that is only needed for a specific subtask into a reference file and link to it — that is the progressive disclosure the repo relies on to stay cheap in context. Every reference file must be reachable from `SKILL.md`; the validator fails on orphans.
 
 ## Rules
 
@@ -45,11 +53,20 @@ The frontmatter `description` is the primary triggering mechanism. It should be 
 
 ## Local check
 
-Confirm the structure and that the frontmatter parses:
+Run the validator before opening a pull request. It catches the failure modes that have actually broken this repo:
 
 ```bash
-ls -R skills/b0rks-uiux
-python3 -c "import yaml;print(yaml.safe_load(open('skills/b0rks-uiux/SKILL.md'))['name'])"
+./scripts/validate.sh
+```
+
+It verifies that frontmatter parses and the skill name matches its directory, that `metadata.version` is present (without it `omp skill publish` silently refuses to package), that every relative markdown link resolves, that `package.json` and `SKILL.md` agree on name and version, that no markdown heading is malformed (`#Heading` renders as literal text), and that no reference file has been orphaned away from `SKILL.md`.
+
+Then confirm the packaging paths still work:
+
+```bash
+omp skill publish ./skills/b0rks-uiux --dry-run   # Skillshare registry
+npm pack --dry-run                                # npm tarball
+omp plugin install . && omp plugin doctor          # OMP plugin
 ```
 
 Rendering the banner:
@@ -57,6 +74,17 @@ Rendering the banner:
 ```bash
 rsvg-convert -w 1200 assets/banner.svg -o /tmp/banner.png
 ```
+
+## Publishing
+
+Two registries, each with its own credential:
+
+- **Skillshare** (`skills.omp.sh`) — needs a Stencil account: run `omp` and use `/login → Stencil`, or set `STENCIL_API_KEY`. Publish with `omp skill publish ./skills/b0rks-uiux`.
+- **npm** — needs `npm login`. Publish with `npm publish --access public`.
+
+Bump `metadata.version` in `SKILL.md` **and** `version` in `package.json` together; the validator fails if they drift. `omp skill version <patch|minor|major|x.y.z>` updates the frontmatter for you.
+
+> **Renaming the skill breaks installed plugin links.** If the directory, frontmatter `name`, or `package.json` name changes, existing local plugin links keep pointing at the old identity and `omp plugin uninstall` may report "not installed" because the lockfile key no longer matches. Remove the orphaned entry from `~/.omp/plugins/omp-plugins.lock.json` and the stale symlink in `~/.omp/plugins/node_modules/`, then reinstall.
 
 ## License
 

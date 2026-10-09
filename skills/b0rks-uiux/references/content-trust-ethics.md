@@ -15,7 +15,7 @@ Use this reference for microcopy, forms, dense tools, onboarding, consent, billi
 
 ## Cognitive and neurodiversity-informed usability
 
-Consult [W3C Making Content Usable for People with Cognitive and Learning Disabilities](https://www.w3.org/TR/coga-usable/). It is practical supporting guidance, **not** a normative WCAG success criterion checklist.
+Consult [W3C Making Content Usable for People with Cognitive and Learning Disabilities](https://www.w3.org/TR/coga-usable/) (W3C Working Group Note, 29 April 2021). It is practical supporting guidance, **not** a normative WCAG success criterion checklist.
 
 - Keep instructions and terminology consistent across steps.
 - Avoid relying on memory of details shown elsewhere; keep needed context visible or retrievable.

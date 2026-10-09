@@ -136,7 +136,9 @@ omp plugin list
 # ● b0rks-uiux-skill@0.3.0
 ```
 
-Restart OMP after installation. The expected plugin namespace is `b0rks-uiux-skill/b0rks-uiux`. Hosts bundling older copies must migrate explicitly; the new identifier is not a backward-compatible alias.
+Restart OMP after installation. The skill is then available as `b0rks-uiux`. Hosts bundling older copies must migrate explicitly — `b0rks-uiux` is a new identifier, not a backward-compatible alias for `bizar-uiux`.
+
+> **If both `b0rks-uiux` and `bizar-uiux` appear**, that is expected: the older name comes from the copy bundled inside `@polderlabs/bizar-omp`. OMP disambiguates with a plugin-namespaced identifier (for example `b0rks-uiux-skill/b0rks-uiux`) when two skills share a name. A stray third entry usually means a stale plugin link from an earlier install — check `omp plugin list --json` for duplicates pointing at the same path and remove the orphaned one.
 
 ### On the Skillshare registry
 
