@@ -4,7 +4,7 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-6EA8FF?style=flat-square"></a>
-  <img alt="Skill files" src="https://img.shields.io/badge/skill-11%20files-8F7CFF?style=flat-square">
+  <img alt="Skill files" src="https://img.shields.io/badge/skill-12%20files-8F7CFF?style=flat-square">
   <img alt="No runtime dependencies" src="https://img.shields.io/badge/dependencies-none-3FB950?style=flat-square">
 </p>
 
@@ -89,6 +89,12 @@ This remains a documentation-first skill, not a UI component framework. Treat th
 skills/bizar-uiux/
 ├── SKILL.md                      # Entry point: operating model, priorities, output format
 ├── references/
+│   ├── agent-workflow.md         # Task model, implementation and verification process
+│   ├── interaction-patterns.md  # Keyboard, focus, forms and coding-agent chat
+│   ├── design-systems.md        # Tokens, themes, responsive and locale support
+│   ├── evaluation-playbook.md   # QA matrix, automated and manual checks
+│   ├── content-trust-ethics.md  # Honest content, cognitive access and consent
+│   ├── research-addendum-2026.md # Additional primary-source guidance
 │   ├── principles.md             # 40 principles mapped to concrete design guidance
 │   ├── review-checklist.md       # 16-section audit checklist
 │   ├── standards-targets.md      # Verified WCAG / performance thresholds
@@ -273,6 +279,8 @@ Used for audits and final implementation review:
 | 6 | Visual hierarchy | 14 | Implementation quality |
 | 7 | Consistency & familiarity | 15 | Generic-default review |
 | 8 | Accessibility | | |
+
+16. **Agent delivery and state completeness** — inspect before rewriting, specify state contracts, verify actual behavior, and report what was not tested.
 
 Only relevant sections are applied — the skill does not force findings into categories that don't apply to your product.
 
