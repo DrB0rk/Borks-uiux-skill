@@ -18,6 +18,12 @@
   ],
   "files": [
     "skills/",
+    "mcp/src/",
+    "mcp/package.json",
+    "mcp/bun.lock",
+    "mcp/README.md",
+    "scripts/install-mcp.sh",
+    "scripts/validate.sh",
     "README.md",
     "LICENSE"
   ],
