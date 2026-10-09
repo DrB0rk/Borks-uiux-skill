@@ -18,7 +18,19 @@ Requires Node 18+. Dependencies install automatically on first run.
 
 ## The `.b0x/` folder
 
-Created in the project root on first use — the first existing `.b0x/`, else the git root, else the working directory.
+Created **automatically** at the project root the first time any `b0x_*` tool is called — including read-only ones like `b0x_context`, which the skill calls before designing. Memory is therefore ready before anything is recorded.
+
+The first existing `.b0x/` wins; otherwise the git root; otherwise the working directory.
+
+Auto-init only fires inside a real project — a `.git` root or an existing `.b0x/`. In a bare directory with no VCS it declines rather than scattering memory folders through `/tmp`.
+
+Set `B0X_AUTOINIT=0` to disable it entirely:
+
+```bash
+B0X_AUTOINIT=0 omp
+```
+
+A freshly created folder contains `config.json` and a `context.md` that explains itself, so opening it cold is not confusing.
 
 | File | Purpose |
 |---|---|

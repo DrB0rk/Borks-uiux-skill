@@ -27,6 +27,13 @@ async function main() {
   t("b0x_status (fresh project)");
   console.log("  " + (await call("b0x_status")).replace(/\n/g, "\n  "));
 
+  t("auto-init: read-only call creates .b0x");
+  const fs = await import("node:fs");
+  const path = await import("node:path");
+  const dir = path.join(process.argv[2], ".b0x");
+  console.log(`  .b0x created by a context read: ${fs.existsSync(dir)}`);
+  console.log(`  files: ${fs.readdirSync(dir).sort().join(" ")}`);
+
   t("b0x_record ×3");
   console.log("  " + JSON.parse(await call("b0x_record", {
     kind: "rejection",

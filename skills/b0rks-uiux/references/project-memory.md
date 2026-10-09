@@ -22,7 +22,9 @@ user corrects you    supersede the old entry, record the new one
 
 Call `b0x_context` first. It returns the project's hard rejections, then preferences, then confirmed patterns. Apply them to the work you are about to do — not retroactively after the user has already complained.
 
-If the memory is empty, proceed normally. An empty `.b0x/` is not a signal to guess what the user might want.
+The `.b0x/` folder is created automatically on that first call, so there is no setup step and no empty-folder bookkeeping. An empty `.b0x/` is not a signal to guess what the user might want — it just means nothing durable has been said yet.
+
+If the memory is empty, proceed normally.
 
 ## Recording feedback
 

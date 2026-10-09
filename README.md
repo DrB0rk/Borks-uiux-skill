@@ -77,6 +77,8 @@ Next session, before proposing anything:
   → applies them
 ```
 
+**No setup per project.** The `.b0x/` folder is created automatically the first time the skill reads memory, so it appears in any project you work in without you doing anything. It only auto-creates inside a real project (a git root), so it won't scatter through `/tmp`; set `B0X_AUTOINIT=0` to turn it off.
+
 Three kinds of entry, treated differently:
 
 | Kind | Meaning | How the skill treats it |

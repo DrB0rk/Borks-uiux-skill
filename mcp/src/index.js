@@ -13,6 +13,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod";
 import {
   KINDS,
+  autoInit,
   ensure,
   findProjectRoot,
   isInitialised,
@@ -43,20 +44,21 @@ server.registerTool(
     inputSchema: {},
   },
   async () => {
-    const root = findProjectRoot();
-    const initialised = isInitialised(root);
-    const entries = initialised ? load(root) : [];
+    const { root, created, reason } = autoInit();
+    const entries = load(root);
     const counts = Object.fromEntries(KINDS.map((k) => [k, entries.filter((e) => e.kind === k).length]));
     return asText({
       projectRoot: root,
       project: root.split("/").pop(),
-      initialised,
+      initialised: isInitialised(root),
+      createdNow: Boolean(created),
+      ...(reason ? { autoInitSkipped: reason } : {}),
       b0xPath: `${root}/.b0x`,
       total: entries.length,
       counts,
-      hint: initialised
+      hint: entries.length
         ? "Call b0x_context and honour hard rejections before doing UI/UX work."
-        : "No memory yet. Call b0x_record when the user gives durable design feedback.",
+        : "Memory is ready but empty. Call b0x_record when the user gives durable design feedback.",
     });
   }
 );
@@ -76,7 +78,7 @@ server.registerTool(
   },
   async ({ kind, text, tags, source }) => {
     try {
-      const root = findProjectRoot();
+      const { root } = autoInit();
       ensure(root);
       const entry = normalise({ kind, text, tags, source });
       const entries = [...load(root), entry];
@@ -107,7 +109,7 @@ server.registerTool(
     },
   },
   async ({ kind, limit = 50 }) => {
-    const root = findProjectRoot();
+    const { root } = autoInit();
     const entries = load(root).filter((e) => !kind || e.kind === kind);
     return asText({
       projectRoot: root,
@@ -125,7 +127,7 @@ server.registerTool(
     inputSchema: { id: z.string().uuid().describe("Entry id returned by b0x_record or b0x_list") },
   },
   async ({ id }) => {
-    const root = findProjectRoot();
+    const { root } = autoInit();
     const entries = load(root);
     const next = entries.filter((e) => e.id !== id);
     if (next.length === entries.length) return asText({ ok: false, error: `No entry with id ${id}` });
@@ -145,7 +147,7 @@ server.registerTool(
     inputSchema: {},
   },
   async () => {
-    const root = findProjectRoot();
+    const { root } = autoInit();
     if (!isInitialised(root)) {
       return asText(
         "# Project design memory\n\n_No .b0x memory for this project yet._\n\nCall `b0x_record` when the user gives durable design feedback."
