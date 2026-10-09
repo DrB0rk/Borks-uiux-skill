@@ -4,7 +4,7 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-6EA8FF?style=flat-square"></a>
-  <img alt="Skill files" src="https://img.shields.io/badge/skill-14%20files-8F7CFF?style=flat-square">
+  <img alt="Skill files" src="https://img.shields.io/badge/skill-15%20files-8F7CFF?style=flat-square">
   <img alt="No runtime dependencies" src="https://img.shields.io/badge/dependencies-none-3FB950?style=flat-square">
 </p>
 
@@ -135,6 +135,22 @@ Entries are written as reusable directives (`"No saturated accent bar on active 
 
 ---
 
+## Motion, effects and icons
+
+New in 0.5.0 — `references/motion-effects.md` and icon guidance in `references/design-systems.md`.
+
+**Motion.** Reach for CSS first: web.dev's rule is CSS for one-shot transitions, JavaScript when you need real control. For morphing between states, the **FLIP** technique (First, Last, Invert, Play, from Paul Lewis) animates only transforms, so layout happens once — or use GSAP's Flip plugin, which does it for you.
+
+**GSAP — and its licence is not "free".** This matters more than it sounds. GSAP is owned by Webflow and carries a custom `Standard 'no charge' license`, *not* MIT or ISC. It permits commercial use only while **end users are not charged a fee of any kind**; charging the client a one-time build fee is explicitly fine, and AI-generated code is explicitly allowed. It does *not* cover no-code animation builders that compete with Webflow's. If your product charges users for access, you need a Business licence.
+
+**Shadows.** `box-shadow` draws behind the element's entire box; `filter: drop-shadow()` follows the actual alpha channel. MDN's wording: `drop-shadow()` "creates a shadow that conforms to the shape of the image itself". Use the first for rectangular surfaces, the second for logos, SVG and text.
+
+**Icons.** Use [Lucide](https://lucide.dev) (ISC licensed) rather than hand-authoring SVG. Drawn icons drift in stroke width, corner radius and optical centring. Decorative icons get **no** `aria-label`; functional ones need a real name; an icon is never the interactive element — wrap it in a `<button>`.
+
+**Motion accessibility.** SC 2.3.3 *Animation from Interactions* is **Level AAA**, not AA — a common misstatement. What is Level A: 2.2.2 *Pause, Stop, Hide* and 2.3.1 *Three Flashes*. Honour `prefers-reduced-motion` by reducing or replacing motion, never by deleting the feedback it carried.
+
+---
+
 ## Reviewing agent-generated UI
 
 `references/ai-assisted-ui.md` covers interfaces built with coding agents. Its stance is deliberately conservative:
@@ -215,7 +231,7 @@ Verify it registered:
 
 ```bash
 omp plugin list
-# ● b0rks-uiux-skill@0.4.0
+# ● b0rks-uiux-skill@0.5.0
 ```
 
 Restart OMP after installation. The skill is then available as `b0rks-uiux`. Hosts bundling older copies must migrate explicitly — `b0rks-uiux` is a new identifier, not a backward-compatible alias for `bizar-uiux`.

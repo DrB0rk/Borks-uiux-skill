@@ -90,8 +90,7 @@ server.registerTool(
       if (proj.available === false) return asText(notAvailable(proj) ?? "");
       const { root } = proj;
       const entry = normalise({ kind, text, tags, source });
-      const { kept, dropped, droppedRejections } = append(root, entry);
-      const context = renderContext(root, kept);
+      const { kept, dropped, droppedRejections, context } = append(root, entry);
       return asText({
         ok: true,
         recorded: entry,

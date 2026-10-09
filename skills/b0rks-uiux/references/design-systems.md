@@ -8,6 +8,33 @@ Inspect existing primitives, token definitions, component variants, typography, 
 
 For a new product, write a compact **design envelope** before generating many screens: domain tone, content density, grid/spacing logic, type scale, semantic color roles, interaction language, motion rules and image treatment. Prefer a small coherent system to a broad palette of arbitrary components.
 
+## 1b. Icons: use a library, do not draw them
+
+**Do not hand-author SVG icons.** Drawn icons drift in stroke width, corner radius, cap style, and optical centring, and they are almost always worse than a maintained set. Use [Lucide](https://lucide.dev) — it is the default unless the product already has a licensed icon set.
+
+| Need | Package |
+|---|---|
+| Vanilla web | `npm install lucide` |
+| React | `npm install lucide-react` |
+| Static assets / CDN | `npm install lucide-static` |
+
+All are ISC licensed, so they are permissive enough for any product. Verify against the current licence before shipping — do not copy a version number from memory.
+
+When a needed icon genuinely does not exist in the library, commission or select one properly rather than sketching it inline. A mismatched icon is a smaller defect than a hand-drawn one.
+
+### Accessibility
+
+Lucide's own guidance, and it is the correct pattern:
+
+- Icons render `aria-hidden="true"` by default — they are decorative until given meaning.
+- **Decorative icons get no `aria-label`.** Adding one makes a screen reader announce an icon the user does not need announced.
+- **Functional or standalone icons need a real accessible name.** Prefer visually-hidden text over an `aria-label` on the icon itself, so the name matches any visible label.
+- **An icon is never the interactive element.** Wrap it in a real `<button>` or `<a>` so it is keyboard-focusable and operable. A clickable `<svg>` is not a control.
+- Interactive targets should reach roughly 44 × 44 px, and icon contrast must still meet 4.5:1 — an icon is text.
+- Never let colour alone convey the state an icon represents; pair it with a non-colour signal.
+
+Keep stroke width consistent across a set. Lucide uses a consistent stroke by default; overriding it per-icon is how a set starts looking assembled rather than designed.
+
 ## 2. Separate token layers
 
 | Layer | Example | Purpose |

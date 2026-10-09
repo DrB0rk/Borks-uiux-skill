@@ -197,7 +197,12 @@ export function append(root, entry) {
   return withLock(root, () => {
     const report = save(root, [...load(root), entry]);
     appendLog(root, { action: "record", id: entry.id, kind: entry.kind });
-    return report;
+    // Regenerate here as well as in remove(), so context.md can never go stale
+    // regardless of whether the caller goes through the MCP tool or the store
+    // API directly. The rendered text is returned so callers never re-render
+    // outside the lock.
+    const context = renderContext(root, report.kept);
+    return { ...report, context };
   });
 }
 

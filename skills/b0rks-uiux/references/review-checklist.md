@@ -49,7 +49,12 @@ Use only the sections relevant to the product and task. This is a review aid, no
 - Do active/selected items use one primary emphasis signal, rather than stacking a filled card with a saturated accent edge?
 - Where an accent edge marks the current item, is state also conveyed without relying on colour alone?
 - Are cards/borders/shadows doing structural work, or just adding visual noise?
+- Are icons drawn from a maintained set (e.g. Lucide) rather than hand-authored inline SVG?
+- Does every functional icon have an accessible name, and do decorative ones stay hidden from assistive technology?
+- Is every interactive icon wrapped in a real button or link rather than being the control itself?
 - Does the layout remain balanced without flattening important hierarchy?
+
+See [design-systems.md](design-systems.md) for icon and elevation guidance, and [motion-effects.md](motion-effects.md) for shadows, glow and effects.
 
 ## 7. Consistency and familiarity
 - Does the interface follow the host platform's conventions?
@@ -73,6 +78,8 @@ Use only the sections relevant to the product and task. This is a review aid, no
 - Does the interface survive 200%+ zoom/reflow and user text-spacing overrides?
 - Are dynamic status messages programmatically determinable without moving focus?
 - Is meaningful motion reducible and non-essential, honouring `prefers-reduced-motion`?
+- Does auto-playing motion that runs longer than five seconds provide a way to pause, stop, or hide it (WCAG 2.2.2)?
+- Does anything flash more than three times per second (WCAG 2.3.1)?
 
 Thresholds and the caveats around them are in [standards-targets.md](standards-targets.md).
 

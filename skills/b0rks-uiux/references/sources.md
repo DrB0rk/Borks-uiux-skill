@@ -33,6 +33,17 @@ Every citation below was checked against its source during the integration of th
 | Hohn & Loydl (i-com '26), DOI 10.1515/icom-2026-0018 | **Cited as practitioner reflection only.** The paper is real and the Intent-Context-Quality framing is confirmed from the Crossref abstract, but it is a practice-based reflection, not an empirical study. It is used for framing, never as evidence. |
 | Mowar, Peng, Steinfeld & Bigham (ACM ASSETS '24), DOI 10.1145/3663548.3688513 | **Cited for subject only.** Title, authors, and research question confirmed — the paper genuinely studies AI coding assistants and web accessibility. No specific quantitative claim is drawn from it. |
 
+**Motion, effects and icons — verified.** `motion-effects.md` rests on checks made directly against primary sources:
+
+- **GSAP licensing — verified, and the nuance matters.** GSAP is *not* MIT, ISC, or otherwise open-source. The published npm licence string is `Standard 'no charge' license`, owned by Webflow. It permits commercial use only while end users are not charged a fee of any kind; a one-time client fee for building the product is explicitly fine; AI-generated code is explicitly allowed. It prohibits use in no-code visual animation builders that compete with Webflow's, and Webflow may revise the terms. **Do not describe GSAP as simply "free"** — the end-user-fee condition is the operative limit. Version confirmed at 3.15.0 via the npm registry.
+- **Lucide — verified.** ISC licence, read from the repository LICENSE file. Packages `lucide`, `lucide-react` and `lucide-static` confirmed at 1.54.0 on npm. Accessibility behaviour (icons `aria-hidden` by default; decorative icons get no `aria-label`; functional icons need a real name; interactive icons must be wrapped in semantic elements) is from Lucide's own accessibility guidance.
+- **WCAG motion criteria — verified.** SC 2.3.3 Animation from Interactions is **Level AAA**, not AA — a common and consequential misstatement. SC 2.2.2 Pause, Stop, Hide and SC 2.3.1 Three Flashes or Below Threshold are both **Level A**. SC 1.4.2 Audio Control is Level A but governs audio only and must not be cited as covering motion.
+- **prefers-reduced-motion — verified.** MDN wording and Baseline Widely Available status confirmed.
+- **Shadows — verified.** MDN confirms `box-shadow` draws behind the element's entire box while `drop-shadow()` "creates a shadow that conforms to the shape (alpha channel) of the image itself".
+- **Material elevation — verified with a caveat.** The documented dp scale (1/2/3/4/6/8/9/12/16/24) comes from the **archived Material 1** page, which is explicitly no longer maintained; Material 3 is current and its elevation system may differ. Cite it as a well-established model, not as current normative guidance.
+- **CSS versus JS — verified.** web.dev recommends CSS for simpler one-shot transitions and JavaScript when significant control is needed. The article dates to 2014; the principle holds, but it predates the Web Animations API's now-broad support.
+- **FLIP — verified.** Documented by Paul Lewis on Aerotwist, expanding to First, Last, Invert, Play. The GSAP Flip plugin is documented at `gsap.com/docs/v3/Plugins/Flip/` and was added in v3.9.0.
+
 **Tier C — verified.** All seven Nielsen Norman Group articles cited (ten usability heuristics, five principles of visual design, recognition and recall, progressive disclosure, icon usability, error-message guidelines, visibility of system status) are live and on-topic. The five visual-design principles — scale, visual hierarchy, balance, contrast, Gestalt — were confirmed as the actual published list. Stated publication dates for recognition-and-recall, error-message guidelines, and visibility of system status were confirmed from page metadata.
 
 **Tier D — live but observational.** Practitioner commentary on AI-generated UI conventions is used only to corroborate implementation smells already supported by stronger accessibility and usability evidence. Such sources never establish authorship and never justify a requirement on their own.
@@ -47,6 +58,8 @@ No numeric research finding should be restated in this skill unless the underlyi
 - **[review-checklist.md](review-checklist.md)** — original synthesis informed by established usability heuristics and the verified standards above.
 - **[standards-targets.md](standards-targets.md)** — numeric thresholds drawn from normative W3C, platform, and web.dev sources, each verified against its primary source as recorded above.
 - **[ai-assisted-ui.md](ai-assisted-ui.md)** — synthesis of verified peer-reviewed findings on AI-generated interface quality, plus a risk rubric created for this skill's use. That rubric is **not a published standard** and carries no external authority.
+- **[design-systems.md](design-systems.md)** — tokens, elevation and iconography. Lucide's licence and accessibility behaviour verified against the project itself.
+- **[motion-effects.md](motion-effects.md)** — CSS versus JS choice, FLIP/morphing, shadow and glow technique, GSAP licensing terms, and WCAG motion criteria — each verified against its primary source as recorded above.
 
 ## Laws of UX
 
