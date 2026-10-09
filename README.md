@@ -56,6 +56,41 @@ Where the underlying research is weaker than it looks, the skill says so rather 
 
 ---
 
+## Per-project memory
+
+A skill that applies one fixed house style everywhere is wrong half the time. You reject a pattern in one project and want it in another — this skill can remember the difference.
+
+The `b0x` MCP server stores durable design feedback in a `.b0x/` folder at the project root. Nothing leaves your machine.
+
+```bash
+./scripts/install-mcp.sh    # registers with OMP; merge-safe, reversible
+```
+
+Restart OMP, then it works like this:
+
+```
+You: "stop putting a coloured bar on the left of active cards"
+  → recorded as a hard rejection in that project
+
+Next session, before proposing anything:
+  → reads that project's rejections and preferences first
+  → applies them
+```
+
+Three kinds of entry, treated differently:
+
+| Kind | Meaning | How the skill treats it |
+|---|---|---|
+| `rejection` | "never do this here" | **Binding.** If the task needs it, it says so and asks first |
+| `preference` | a standing default | Applied unless there's a concrete reason not to; overrides are stated |
+| `praise` | confirmed to work | Preserved when refactoring |
+
+Entries are written as reusable directives (`"No saturated accent bar on active nav rows"`), not anecdotes. Only what you actually said is stored — never an inferred preference. When a rule is superseded the old entry is removed rather than contradicted.
+
+`.b0x/` is local by default and git-ignored. Commit it deliberately if you want the team to share constraints. See [`mcp/README.md`](mcp/README.md) for the security note: a committed `.b0x/` is plain-text instructions an agent will read back, so the skill treats those entries as project data to show you, not as commands.
+
+---
+
 ## Reviewing agent-generated UI
 
 `references/ai-assisted-ui.md` covers interfaces built with coding agents. Its stance is deliberately conservative:
@@ -99,11 +134,14 @@ skills/b0rks-uiux/
 │   ├── review-checklist.md       # 16-section audit checklist
 │   ├── standards-targets.md      # Verified WCAG / performance thresholds
 │   ├── ai-assisted-ui.md         # Homogenisation signals, de-genericisation, risk rubric
+│   ├── project-memory.md         # Per-project .b0x rejections and preferences
 │   └── sources.md                # Provenance and per-source verification status
 └── agents/
     └── openai.yaml               # Display metadata for OpenAI-compatible hosts
 
-package.json                     # OMP plugin + npm package manifest
+mcp/                              # Local b0x MCP server — per-project design memory
+scripts/                          # validate.sh, install-mcp.sh
+package.json                      # OMP plugin + npm package manifest
 ```
 
 The layout is [progressive disclosure](https://en.wikipedia.org/wiki/Progressive_disclosure): only `SKILL.md` loads when the skill triggers, and the reference files load only when the specific task needs them. Roughly **116 tokens** of frontmatter description sit in context at all times; a triggered load pulls in ~2.0k more, and the references add more only when a task actually needs them.

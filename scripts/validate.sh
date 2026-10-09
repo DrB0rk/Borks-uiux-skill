@@ -102,6 +102,30 @@ orphans=$(comm -23 \
   <(grep -o 'references/[a-z0-9.-]*\.md' "$skill_dir/SKILL.md" | xargs -n1 basename 2>/dev/null | sort -u))
 if [[ -z "$orphans" ]]; then ok "every reference file is linked from SKILL.md"; else bad "orphaned reference files (never loaded):"; echo "$orphans" | sed 's/^/        /'; fi
 
+# 6. Committed .b0x memory is visible at review time
+if [[ -d .b0x ]]; then
+  n=$(python3 -c "import json;print(len(json.load(open('.b0x/entries.json'))))" 2>/dev/null || echo "?")
+  if git check-ignore -q .b0x 2>/dev/null; then
+    ok ".b0x present and git-ignored (local only)"
+  else
+    printf '  \033[33mnote\033[0m  .b0x/ is present with %s entries and is NOT git-ignored.\n' "$n"
+    printf '        It will be committed with the repo. That is valid for sharing team\n'
+    printf '        constraints, but review it first - it is plain text instructions\n'
+    printf '        read back by an agent. See mcp/README.md.\n'
+  fi
+fi
+
+# 7. MCP server is present and syntactically loadable
+if [[ -f mcp/src/index.js ]]; then
+  if node --check mcp/src/index.js 2>/dev/null && node --check mcp/src/store.js 2>/dev/null; then
+    ok "mcp server sources parse"
+  else
+    bad "mcp server has a syntax error"
+  fi
+else
+  bad "mcp/src/index.js missing"
+fi
+
 echo
 if [[ $fail -eq 0 ]]; then
   printf '\033[32mAll checks passed.\033[0m Safe to publish.\n'

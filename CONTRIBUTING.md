@@ -28,10 +28,31 @@ If you cannot state the observable user consequence of your guidance, it is a pr
 | QA strategy and verification sequencing | `skills/b0rks-uiux/references/evaluation-playbook.md` |
 | Standards provenance and 2026 source map | `skills/b0rks-uiux/references/research-addendum-2026.md` |
 | Provenance / attribution / verification status | `skills/b0rks-uiux/references/sources.md` |
+| Per-project rejections and preferences | `.b0x/` via the `b0x_*` MCP tools |
 | Priority order, severity rubric, output format | `skills/b0rks-uiux/SKILL.md` |
 | Triggering behavior | `SKILL.md` frontmatter `description` |
 
 **Keep `SKILL.md` lean.** It loads in full whenever the skill triggers. Move anything that is only needed for a specific subtask into a reference file and link to it — that is the progressive disclosure the repo relies on to stay cheap in context. Every reference file must be reachable from `SKILL.md`; the validator fails on orphans.
+
+## Per-project memory
+
+Design feedback belongs in the project, not in the global skill. If a user rejects a pattern, that is a property of one codebase and should never become a global default — the same person may want it in the next project.
+
+The `b0x` MCP server stores those in `.b0x/` at the project root:
+
+```bash
+./scripts/install-mcp.sh      # register with OMP
+node mcp/test/e2e.mjs /tmp/x  # exercise the server over the real MCP protocol
+```
+
+Rules that keep this honest:
+
+- **Record only what the user said.** Never store an inferred preference. If durability is unclear, ask.
+- **Write directives, not anecdotes.** `"No saturated accent bar on active nav rows"` is reusable; `"the user didn't like the last mockup"` is not.
+- **Supersede, don't contradict.** Use `b0x_forget` before recording a replacement, so the snapshot the agent reads never contains two rules that disagree.
+- **Keep `.b0x/` git-ignored by default.** Committing it shares constraints with the team, which is legitimate and sometimes desirable — but it is plain-text instructions an agent will read back. Review before committing.
+
+Changes to `mcp/src/` must keep both properties the tests rely on: `entries.json` is written atomically, and no user-supplied value ever reaches a filesystem path.
 
 ## Rules
 

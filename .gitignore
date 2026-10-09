@@ -10,3 +10,10 @@ Thumbs.db
 eval-viewer/
 __pycache__/
 *.pyc
+
+# MCP server build artefacts
+mcp/node_modules/
+
+# Per-project design memory created by the b0x MCP server.
+# Local by default; commit deliberately to share constraints with a team.
+.b0x/
