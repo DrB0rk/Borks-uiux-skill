@@ -237,7 +237,7 @@ Verify it registered:
 
 ```bash
 omp plugin list
-# ● b0rks-uiux-skill@0.6.0
+# ● b0rks-uiux-skill@0.7.0
 ```
 
 Restart OMP after installation. The skill is then available as `b0rks-uiux`. Hosts bundling older copies must migrate explicitly — `b0rks-uiux` is a new identifier, not a backward-compatible alias for `bizar-uiux`.

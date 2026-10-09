@@ -2,7 +2,7 @@
 name: b0rks-uiux
 description: Research, design, implement, audit, and validate UI/UX in web, mobile, and developer tools. Use for frontend coding, interface design, redesigns, responsive layouts, design systems and tokens, component interactions, agent/chat interfaces, forms, accessibility, content design, keyboard usability, interaction state modeling, performance, and AI-generated UI quality review. Produce evidence-backed fixes, complete states, and practical verification rather than generic visual polish.
 metadata:
-  version: 0.6.0
+  version: 0.7.0
 ---
 
 # B0rk's UI/UX SKILL
