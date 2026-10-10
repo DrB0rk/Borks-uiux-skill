@@ -167,6 +167,59 @@ It distinguishes **consistency** (purposeful reuse within a product) from **homo
 
 It is also explicit about what *must never* be used as an accusation: a common font, Tailwind, shadcn/ui, Material, rounded cards, a purple gradient, dark mode, or a bento grid. The review target is **lack of intent, not style membership**.
 
+## OMP comparison benchmark
+
+These screenshots compare three UI generations with the B0rk UI/UX plugin disabled and enabled. Each pair used the same prompt in a fresh, empty directory, with OMP `v18.8.6`, `MiniMax-M3.1-Flash-Preview` at low thinking, and a 1440 × 1000 Chromium viewport. The baseline used `--no-skills`; the plugin run used `--skills b0rks-uiux`. Each image shows the initial viewport of the generated, self-contained HTML page.
+
+This is a visual example from one run per prompt, not a statistically reliable benchmark. The three plugin OMP calls exceeded a four-minute harness timeout after writing `index.html`; those pages were rendered and captured, but the OMP turns did not return a final response. The screenshots show rendered output; they do not establish that interaction, accessibility, responsive behavior, or claims made by the generating agent were tested.
+
+### Coffee shop pickup
+
+<table>
+  <tr><th>Without plugin</th><th>With B0rk UI/UX plugin</th></tr>
+  <tr>
+    <td><img src="assets/benchmarks/1-baseline.png" alt="Coffee shop pickup page generated without the B0rk UI/UX plugin" width="640"></td>
+    <td><img src="assets/benchmarks/1-plugin.png" alt="Coffee shop pickup page generated with the B0rk UI/UX plugin" width="640"></td>
+  </tr>
+</table>
+
+### Daily task planner
+
+<table>
+  <tr><th>Without plugin</th><th>With B0rk UI/UX plugin</th></tr>
+  <tr>
+    <td><img src="assets/benchmarks/2-baseline.png" alt="Daily task planner generated without the B0rk UI/UX plugin" width="640"></td>
+    <td><img src="assets/benchmarks/2-plugin.png" alt="Daily task planner generated with the B0rk UI/UX plugin" width="640"></td>
+  </tr>
+</table>
+
+### Bookstore analytics dashboard
+
+<table>
+  <tr><th>Without plugin</th><th>With B0rk UI/UX plugin</th></tr>
+  <tr>
+    <td><img src="assets/benchmarks/3-baseline.png" alt="Bookstore analytics dashboard generated without the B0rk UI/UX plugin" width="640"></td>
+    <td><img src="assets/benchmarks/3-plugin.png" alt="Bookstore analytics dashboard generated with the B0rk UI/UX plugin" width="640"></td>
+  </tr>
+</table>
+
+<details>
+<summary>Exact prompts</summary>
+
+**Coffee shop pickup**
+
+> Build a polished, responsive single-page web interface for a neighborhood coffee shop online order pickup page. The shop is named "Morrow Coffee". Show a menu with three drinks, clear prices, one selected item, pickup time selection, and a clear primary action. Include useful empty, selected, and confirmation states where practical. Use a distinctive but restrained visual identity, readable hierarchy, semantic HTML, and accessible labels. Implement everything in one self-contained index.html with inline CSS and JavaScript; no external dependencies, assets, or network requests. Make the initial desktop view at 1440x1000 feel complete and ready to use. Create the file in the current directory.
+
+**Daily task planner**
+
+> Build a polished, responsive single-page web interface for a personal task planner called "Daymark". Show today's date, a focused list of five tasks across two groups, one completed task, a visible progress summary, and a clear way to add a task. Include useful empty, selected, and confirmation states where practical. Use a distinctive but restrained visual identity, readable hierarchy, semantic HTML, and accessible labels. Implement everything in one self-contained index.html with inline CSS and JavaScript; no external dependencies, assets, or network requests. Make the initial desktop view at 1440x1000 feel complete and ready to use. Create the file in the current directory.
+
+**Bookstore analytics dashboard**
+
+> Build a polished, responsive single-page analytics dashboard for a small online bookstore called "Papertrail Books". Show a date range selector, revenue and order summary metrics, a weekly trend visualization, top three books, and a useful empty/loading/selected state where practical. Use a distinctive but restrained visual identity, readable hierarchy, semantic HTML, and accessible labels. Implement everything in one self-contained index.html with inline CSS and JavaScript; no external dependencies, assets, or network requests. Make the initial desktop view at 1440x1000 feel complete and ready to use. Create the file in the current directory.
+
+</details>
+
 ---
 
 ## Expanded 2026 edition
