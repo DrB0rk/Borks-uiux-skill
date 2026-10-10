@@ -172,19 +172,55 @@ function rgbToHex({ r, g, b }) {
   const h = (n) => n.toString(16).padStart(2, "0");
   return `#${h(r)}${h(g)}${h(b)}`;
 }
+// Color Vision Deficiency (CVD) simulation matrices (Machado et al. 2009 / Brettel sRGB linear)
+export const CVD_MATRICES = {
+  // Deuteranopia (M-cone absent, ~5.3% males, most common red-green deficiency)
+  deuteranopia: [
+    [0.625, 0.375, 0.0],
+    [0.7, 0.3, 0.0],
+    [0.0, 0.3, 0.7],
+  ],
+  // Protanopia (L-cone absent, ~1.3% males, red-blind)
+  protanopia: [
+    [0.56667, 0.43333, 0.0],
+    [0.55833, 0.44167, 0.0],
+    [0.0, 0.24167, 0.75833],
+  ],
+  // Tritanopia (S-cone absent, ~0.02% population, blue-yellow deficiency)
+  tritanopia: [
+    [0.95, 0.05, 0.0],
+    [0.0, 0.43333, 0.56667],
+    [0.0, 0.475, 0.525],
+  ],
+  // Achromatopsia (monochromacy / total color blindness, ~0.003%)
+  achromatopsia: [
+    [0.299, 0.587, 0.114],
+    [0.299, 0.587, 0.114],
+    [0.299, 0.587, 0.114],
+  ],
+};
+
+/**
+ * Simulate how an sRGB color appears under Color Vision Deficiency (CVD).
+ */
+export function simulateCvd({ r, g, b }, type = "deuteranopia") {
+  const matrix = CVD_MATRICES[type.toLowerCase()] || CVD_MATRICES.deuteranopia;
+  const simR = Math.min(255, Math.max(0, Math.round(matrix[0][0] * r + matrix[0][1] * g + matrix[0][2] * b)));
+  const simG = Math.min(255, Math.max(0, Math.round(matrix[1][0] * r + matrix[1][1] * g + matrix[1][2] * b)));
+  const simB = Math.min(255, Math.max(0, Math.round(matrix[2][0] * r + matrix[2][1] * g + matrix[2][2] * b)));
+  return { r: simR, g: simG, b: simB };
+}
 
 /**
  * Suggest a passing color by adjusting lightness in sRGB space.
  */
 function suggestPassingColor(fgRgb, bgRgb, targetRatio) {
   const bgLum = getRelativeLuminance(bgRgb);
-  // Decide whether to go lighter or darker
   const shouldLighten = bgLum < 0.5;
 
   let best = fgRgb;
   let bestRatio = getContrastRatio(fgRgb, bgRgb);
 
-  // Binary search for passing lightness
   for (let step = 1; step <= 255; step += 3) {
     const candidate = shouldLighten
       ? {
@@ -210,7 +246,6 @@ function suggestPassingColor(fgRgb, bgRgb, targetRatio) {
     }
   }
 
-  // Extreme fallback: white or black
   const fallback = shouldLighten ? { r: 255, g: 255, b: 255 } : { r: 0, g: 0, b: 0 };
   return {
     hex: rgbToHex(fallback),
@@ -219,7 +254,7 @@ function suggestPassingColor(fgRgb, bgRgb, targetRatio) {
 }
 
 /**
- * Audit a single foreground/background color pair against WCAG 2.2.
+ * Audit a single foreground/background color pair against WCAG 2.2 and CVD conditions.
  */
 export function auditContrast(foregroundStr, backgroundStr, role = "normal-text") {
   const fg = parseColor(foregroundStr);
@@ -229,7 +264,6 @@ export function auditContrast(foregroundStr, backgroundStr, role = "normal-text"
   const fgLum = Math.round(getRelativeLuminance(fg) * 1000) / 1000;
   const bgLum = Math.round(getRelativeLuminance(bg) * 1000) / 1000;
 
-  // Thresholds
   const isLarge = role === "large-text";
   const isComponent = role === "ui-component" || role === "non-text";
 
@@ -238,6 +272,27 @@ export function auditContrast(foregroundStr, backgroundStr, role = "normal-text"
 
   const passesAA = ratio >= aaMin;
   const passesAAA = ratio >= aaaMin;
+
+  // Color Vision Deficiency (CVD) Simulation checks
+  const cvdSimulations = {};
+  for (const cvdType of ["deuteranopia", "protanopia", "tritanopia", "achromatopsia"]) {
+    const simFg = simulateCvd(fg, cvdType);
+    const simBg = simulateCvd(bg, cvdType);
+    const simRatio = Math.round(getContrastRatio(simFg, simBg) * 100) / 100;
+    cvdSimulations[cvdType] = {
+      contrastRatio: `${simRatio}:1`,
+      ratioNumeric: simRatio,
+      passesAA: simRatio >= aaMin,
+    };
+  }
+
+  // Dark mode halation warning: extreme 21:1 contrast causes visual scattering for astigmatism
+  let halationWarning = null;
+  const isDarkMode = bgLum < 0.05;
+  if (isDarkMode && fgLum > 0.95 && ratio >= 18.0) {
+    halationWarning =
+      "Extreme contrast in dark mode (>= 18:1). Pure white on pitch black causes visual halation and eye strain for users with astigmatism (~33-50% of adults). Use off-white (#f1f5f9 / oklch(0.92 0.01 260)) on deep slate (#0f172a / oklch(0.15 0.02 260)) in the 10:1–15:1 range.";
+  }
 
   const result = {
     foreground: foregroundStr,
@@ -258,6 +313,8 @@ export function auditContrast(foregroundStr, backgroundStr, role = "normal-text"
         criterion: isComponent ? "1.4.11 Non-text Contrast" : "1.4.6 Contrast (Enhanced)",
       },
     },
+    colorVisionDeficiency: cvdSimulations,
+    ...(halationWarning ? { halationWarning } : {}),
   };
 
   if (!passesAA) {
@@ -273,9 +330,39 @@ export function auditContrast(foregroundStr, backgroundStr, role = "normal-text"
 }
 
 /**
+ * Analyze palette balance according to the 60-30-10 distribution rule.
+ * 60% dominant background/surface, 30% structural/secondary, 10% accent/interactive.
+ */
+export function auditPaletteBalance(paletteRoles) {
+  if (!paletteRoles || typeof paletteRoles !== "object") return null;
+
+  const surface = paletteRoles.surface || paletteRoles["60"] || [];
+  const structural = paletteRoles.structural || paletteRoles.secondary || paletteRoles["30"] || [];
+  const accent = paletteRoles.accent || paletteRoles.primary || paletteRoles["10"] || [];
+
+  const warnings = [];
+  if (Array.isArray(accent) && accent.length > 2) {
+    warnings.push(
+      `Accent creep: ${accent.length} accent colors defined. The 60-30-10 rule reserves the 10% layer for one primary interactive hue (plus optional single destructive hue) to preserve singular emphasis.`
+    );
+  }
+
+  return {
+    rule: "60-30-10 Rule (60% dominant background/surface, 30% structural/secondary, 10% accent/interactive)",
+    layers: {
+      dominant_60: { role: "Canvas & dominant surface", elements: surface },
+      secondary_30: { role: "Structural elements, cards, dividers, typography", elements: structural },
+      accent_10: { role: "Interactive actions & primary focal points", elements: accent },
+    },
+    balanced: warnings.length === 0,
+    warnings,
+  };
+}
+
+/**
  * Batch audit multiple color pairs in a palette.
  */
-export function auditPalette(pairs) {
+export function auditPalette(pairs, paletteRoles = null) {
   if (!Array.isArray(pairs)) {
     throw new Error("pairs must be an array of { foreground, background, role? }");
   }
@@ -283,11 +370,20 @@ export function auditPalette(pairs) {
     auditContrast(foreground, background, role)
   );
   const totalFails = results.filter((r) => !r.standards.wcag_2_2_AA.pass).length;
+
+  const cvdFails = results.filter((r) =>
+    Object.values(r.colorVisionDeficiency).some((c) => !c.passesAA)
+  ).length;
+
+  const balance = paletteRoles ? auditPaletteBalance(paletteRoles) : null;
+
   return {
     totalChecked: results.length,
     failingAA: totalFails,
     passingAA: results.length - totalFails,
     allPassAA: totalFails === 0,
+    colorVisionDeficiencyPasses: cvdFails === 0,
+    ...(balance ? { paletteBalance: balance } : {}),
     results,
   };
 }

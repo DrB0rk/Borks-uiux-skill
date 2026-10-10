@@ -55,6 +55,7 @@ Every citation below was checked against its source during the integration of th
 - **Performance & Core Web Vitals — verified.** web.dev confirms INP officially replaced FID as the responsiveness Core Web Vital in March 2024 (Good ≤ 200 ms at p75). The Long Animation Frames (LoAF) API reached W3C First Public Working Draft status in April 2026, diagnosing rendering updates delayed beyond 50 ms.
 - **Design Tokens Community Group (DTCG) — verified.** W3C Design Tokens Community Group published the Design Tokens Format Module 2025.10 as a stable final Community Group Report on 28 October 2025. Style Dictionary v4 provides native first-class support for the `$value`, `$type`, `$description` format.
 - **Evolving accessibility standards & regulations — verified.** WAI-ARIA 1.3 reached W3C Working Draft status in June 2026 (Editor's Draft September 2026), adding `suggestion`, `comment`, `mark` roles and `aria-description`, `aria-braillelabel`. WCAG 3.0 remains an active W3C Working Draft (March & September 2026), transitioning toward outcome-oriented assertion testing; WCAG 2.2 AA remains the current normative engineering baseline. European Accessibility Act (EAA) entered active legal enforcement across all EU member states on 28 June 2025.
+- **Color perception, eye-tracking & audience models — verified.** Color Vision Deficiency simulation matrices implement the physiologically-based model of Machado, Oliveira & Fernandes (IEEE TVCG 2009). Eye-tracking reading and scanning patterns (F-shaped, layer-cake, spotted, Gutenberg diagram) are sourced from Nielsen Norman Group empirical eye-tracking research. Context of use framework is grounded in ISO 9241-210.
 ### Standing rule
 
 No numeric research finding should be restated in this skill unless the underlying source supports that specific number. Where evidence is an extended abstract, a practitioner reflection, or observational commentary, the conclusion is stated at the strength the evidence actually carries, and the weakness is recorded rather than smoothed over.
@@ -67,6 +68,7 @@ No numeric research finding should be restated in this skill unless the underlyi
 - **[ai-assisted-ui.md](ai-assisted-ui.md)** — synthesis of verified peer-reviewed findings on AI-generated interface quality, plus a risk rubric created for this skill's use. That rubric is **not a published standard** and carries no external authority.
 - **[design-systems.md](design-systems.md)** — tokens, elevation and iconography. Lucide's licence and accessibility behaviour verified against the project itself.
 - **[motion-effects.md](motion-effects.md)** — CSS versus JS choice, FLIP/morphing, shadow and glow technique, GSAP licensing terms, and WCAG motion criteria — each verified against its primary source as recorded above.
+- **[user-cognition-interaction.md](user-cognition-interaction.md)** — color perception science, OKLCH, 60-30-10 palette architecture, Color Vision Deficiency (Machado et al. 2009 model), eye-tracking scanning patterns (Nielsen Norman Group), and audience context models (ISO 9241-210).
 
 ## Laws of UX
 

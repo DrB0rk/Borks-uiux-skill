@@ -80,6 +80,11 @@ Community-observed patterns, not authorship evidence. Treat them as prompts for 
 - all type set in the safest common sans with little hierarchy;
 - identical hover elevation or scale on every card;
 - a saturated accent bar on the leading edge of every selected nav row, stacked on top of a filled card;
+- unmotivated AI sparkle icons (`✨` or Lucide `Sparkles`) on standard search, filter, or text inputs without explaining the underlying capability;
+- shimmer skeleton cascades: 10–15 pulsating shimmer bars causing visual distraction instead of layout-stable structural blocks;
+- faux multimodal chips ("Analyze", "Summarize", "Enhance") displayed before any user content is provided;
+- rule-of-three adjective strings in cards ("intuitive, seamless, and powerful", "fast, flexible, and scalable");
+- monochromatic indigo wash: using indigo-600 (`#4f46e5`) across buttons, badges, links, borders, and active states until the whole app looks like a generated code template;
 - reflexive dark mode used to signal sophistication;
 - bento grids where content has no unequal importance;
 - large whitespace around little content to simulate "premium".

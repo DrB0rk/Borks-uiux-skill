@@ -1,7 +1,7 @@
 {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "repository": "https://github.com/DrB0rk/Borks-uiux-skill",
-  "description": "Global roles and baseline constraints shipped directly with B0rk's UI/UX repository. Synthesized from WCAG 2.2/3.0, WAI-ARIA 1.3, European Accessibility Act, modern CSS baseline (Container Queries, View Transitions, Popover API, oklch, @starting-style), DTCG 2025.10 tokens, and Core Web Vitals (INP, LoAF). These apply across all projects before project-specific .b0x overrides.",
+  "description": "Global roles and baseline constraints shipped directly with B0rk's UI/UX repository. Synthesized from WCAG 2.2/3.0, WAI-ARIA 1.3, European Accessibility Act, modern CSS baseline (Container Queries, View Transitions, Popover API, oklch, @starting-style), DTCG 2025.10 tokens, Core Web Vitals (INP, LoAF), color perception science (CVD, 60-30-10, halation), eye-tracking scanning patterns (F/Z/layer-cake/spotted), and audience context models (B2B vs B2C, aging users, digital literacy).",
   "roles": {
     "ui-engineer": {
       "title": "UI Engineer (Implementation & Primitives)",
@@ -10,6 +10,9 @@
         "Use semantic HTML controls (<button> for actions, <a> for navigation, native inputs) before custom composite widgets.",
         "Never hand-author SVG icons; use maintained icon sets such as Lucide (lucide, lucide-react, lucide-static).",
         "Active or selected navigation items must use a single primary emphasis signal (label weight/contrast or background lift); never stack a colored leading edge accent bar/rail onto a filled card.",
+        "Apply the 60-30-10 palette architecture: 60% dominant canvas/surface neutral, 30% structural/secondary surface and typography, 10% interactive accent.",
+        "In dark mode, prevent visual halation by avoiding pure white (#fff) on pitch black (#000); use off-white text (lightness ~90-92%) on deep slate (lightness ~10-15%).",
+        "Dual-encode all status indicators: pair color with text labels, badges, or distinct shapes for Color Vision Deficiency (CVD, ~8% of men).",
         "Use container queries (@container) and container query units (cqw, cqi) for component-level responsiveness so components adapt to their container rather than viewport width.",
         "Use the native HTML Popover API (popover, popovertarget, :popover-open) and <dialog> for top-layer overlays, ensuring native light-dismiss, top-layer promotion, and focus management.",
         "Use @starting-style with transition-behavior: allow-discrete for clean CSS entry/exit animations from display: none without layout pop.",
@@ -21,10 +24,13 @@
     },
     "ui-auditor": {
       "title": "UI Auditor (Interface Review & Quality Gate)",
-      "charter": "Review and critique interfaces against objective user consequences, measurable standards, and state completeness, resisting generic AI defaults and subjective taste.",
+      "charter": "Review and critique interfaces against objective user consequences, measurable standards, scanning ergonomics, and state completeness, resisting generic AI defaults and subjective taste.",
       "directives": [
         "Classify findings strictly by user consequence (Critical, High, Medium, Low); never report subjective style preferences as defects.",
         "Anchor audit findings in measurable thresholds (WCAG 2.2 AA contrast, 24x24 px pointer minimum, 44-48 px touch target, 320 CSS px reflow, Core Web Vitals INP/LCP/CLS) rather than vague opinions.",
+        "Verify layout against user eye-tracking scanning patterns (F-pattern for text, Layer-cake for headings, Spotted pattern for visual anchors, Gutenberg Z-pattern for landing pages). Ensure visual anchors (bolding, chips, numbers) lead the eye to key actions.",
+        "Calibrate information density to the audience: verify high information density, tabular numeric alignment, and keyboard efficiency for B2B/enterprise workflows, and focused single-path clarity for consumer/B2C flows.",
+        "Verify accessibility for aging users: minimum 16px body type, generous line-height (1.5-1.6), and minimum 44-48px touch targets for declining motor control.",
         "Verify responsiveness against INP (Interaction to Next Paint <= 200ms at p75) and use the Long Animation Frames (LoAF) API to identify main-thread interaction bottlenecks (>50ms).",
         "Remember that automated accessibility scanning (Axe-core, Playwright a11y) catches only 30-40% of WCAG defects; manual keyboard focus/return, zoom/reflow, and screen reader validation are mandatory for compliance.",
         "Audit European Accessibility Act (EAA) compliance for commercial products, ensuring WCAG 2.2 Level AA alignment across key user journeys.",
@@ -37,6 +43,8 @@
       "charter": "Shape labels, microcopy, errors, and flows so every word communicates purpose, guides recovery, and respects user trust.",
       "directives": [
         "Never use marketing-heavy or filler language ('streamline your workflow', 'unlock insights', 'powerful', 'intuitive').",
+        "Front-load key information: place primary action verbs in the first 2 words of headings, labels, and bullet points to match user F-pattern and layer-cake scanning behavior.",
+        "Adapt microcopy to digital literacy: provide explicit text labels alongside icons for novice/occasional users; avoid standalone ambiguous glyphs.",
         "Cut adjectives, superlatives, and abstract qualifiers; replace them with the concrete action or noun ('Create project', not 'Experience seamless productivity').",
         "Write errors as: what happened, what changed, what remains saved, and what the user can do to recover.",
         "For AI and streaming interfaces, implement user scroll-anchoring and block-level markdown buffering to prevent content jumping and layout instability during generation.",
@@ -67,7 +75,7 @@
         "WCAG 2.2 Level AA is the non-negotiable engineering baseline; treat WCAG 2.3.3 (Animation from Interactions) as Level AAA stretch guidance.",
         "Keyboard navigation must be complete: visible, unobscured focus rings, logical tab order, no traps, and predictable focus return on dialog dismiss.",
         "Target size minimum is 24x24 CSS px (WCAG 2.5.8), with 44-48 px as the recommended internal touch target for mobile/pointer comfort.",
-        "Never rely on color alone to convey state or status; pair color with text, shape, or semantic attributes.",
+        "Never rely on color alone to convey state or status; pair color with text, shape, or semantic attributes (WCAG 1.4.1).",
         "Programmatic status updates that do not move focus must be determinable via aria-live or status roles (WCAG 4.1.3).",
         "Prepare for evolving accessibility architectures: implement WAI-ARIA 1.3 attributes (aria-description, aria-braillelabel) and monitor WCAG 3.0 outcome-oriented assertion models."
       ]
@@ -129,6 +137,20 @@
         "kind": "rejection",
         "text": "Never stream AI-generated text without user scroll-anchoring and block-level buffering to prevent content jumping and layout instability.",
         "tags": ["ai", "streaming", "ux"],
+        "source": "b0x global repository baseline"
+      },
+      {
+        "id": "global-rej-color-sole-carrier",
+        "kind": "rejection",
+        "text": "Never use color as the sole carrier of status, selection, or error state. Always pair color with text, an icon, or a distinct shape for Color Vision Deficiency (CVD) accessibility.",
+        "tags": ["color", "accessibility", "cvd"],
+        "source": "b0x global repository baseline"
+      },
+      {
+        "id": "global-rej-dark-mode-halation",
+        "kind": "rejection",
+        "text": "Never use pure white (#ffffff) on pitch black (#000000) for large body text areas in dark mode. Use off-white on deep slate to prevent halation and eye strain.",
+        "tags": ["color", "dark-mode", "typography"],
         "source": "b0x global repository baseline"
       }
     ],
@@ -215,6 +237,27 @@
         "kind": "preference",
         "text": "Use CSS linear() piecewise easing function for spring and physics approximations in CSS without loading JavaScript animation libraries.",
         "tags": ["motion", "spring", "css", "animation"],
+        "source": "b0x global repository baseline"
+      },
+      {
+        "id": "global-pref-60-30-10",
+        "kind": "preference",
+        "text": "Apply the 60-30-10 palette architecture: 60% dominant surface/canvas neutral, 30% structural elements and secondary surfaces, 10% accent/interactive focal points.",
+        "tags": ["color", "palette", "design-system"],
+        "source": "b0x global repository baseline"
+      },
+      {
+        "id": "global-pref-scanning-anchors",
+        "kind": "preference",
+        "text": "Structure scan-heavy layouts with prominent visual anchors (layer-cake headings, spotted numbers/chips) and front-load key verbs to accommodate F-pattern scanning.",
+        "tags": ["layout", "typography", "scanning"],
+        "source": "b0x global repository baseline"
+      },
+      {
+        "id": "global-pref-audience-density",
+        "kind": "preference",
+        "text": "Calibrate information density to the audience: provide dense multi-column tables and keyboard efficiency for B2B/enterprise workflows, and generous breathing room with single-path clarity for B2C consumer flows.",
+        "tags": ["layout", "b2b", "density", "audience"],
         "source": "b0x global repository baseline"
       }
     ]

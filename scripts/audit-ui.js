@@ -22,7 +22,10 @@ B0rk's UI/UX Audit Tooling (CLI)
 
 COMMANDS:
   --contrast <fg> <bg> [--role <normal-text|large-text|ui-component>]
-      Check WCAG 2.2 contrast ratio, relative luminance, and get passing color suggestion.
+      Check WCAG 2.2 contrast ratio, relative luminance, CVD simulations, and dark-mode halation warnings.
+
+  --palette <palette.json>
+      Audit an array of { foreground, background, role? } pairs with CVD simulations and 60-30-10 balance check.
 
   --target <width> <height> [--padding <px>] [--spacing <px>] [--inline]
       Audit touch/pointer target size against WCAG 2.5.8 (24x24), Apple HIG (44x44), Android (48x48).
@@ -117,6 +120,20 @@ async function main() {
     const res = auditTokens(content);
     console.log(JSON.stringify(res, null, 2));
     process.exit(res.valid ? 0 : 1);
+  }
+
+  if (cmd === "--palette") {
+    const file = args[1];
+    if (!file || !fs.existsSync(file)) {
+      console.error(`Error: Palette file not found: ${file}`);
+      process.exit(1);
+    }
+    const data = JSON.parse(fs.readFileSync(file, "utf8"));
+    const pairs = Array.isArray(data) ? data : data.pairs || [];
+    const roles = data.roles || data.paletteRoles || null;
+    const res = auditPalette(pairs, roles);
+    console.log(JSON.stringify(res, null, 2));
+    process.exit(res.allPassAA ? 0 : 1);
   }
 
   console.error(`Unknown command: ${cmd}`);

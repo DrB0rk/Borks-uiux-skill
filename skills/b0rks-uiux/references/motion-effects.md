@@ -176,7 +176,7 @@ Historically, animating elements from `display: none` or top-layer elements (`<d
 }
 ```
 
-This works seamlessly with the native Popover API (`popover`, `popovertarget`) and native `<dialog>`, eliminating the need for custom JS-based overlay animation managers.
+This integrates directly with the native Popover API (`popover`, `popovertarget`) and native `<dialog>`, eliminating the need for custom JS-based overlay animation managers.
 ## Motion accessibility
 
 **The criterion people most often get wrong:** WCAG 2.2 **SC 2.3.3 Animation from Interactions is Level AAA**, not AA. It requires that motion animation triggered by interaction can be disabled unless the animation is essential. Because it is AAA it is not part of an AA conformance claim — but honouring it is cheap and correct.

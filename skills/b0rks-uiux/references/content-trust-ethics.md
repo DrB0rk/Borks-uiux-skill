@@ -20,6 +20,13 @@ Marketing-heavy, decorative or filler language is not a tone choice; it is a def
 Concrete rules:
 
 - **Cut adjectives and superlatives unless they communicate something specific.** "Streamline your workflow", "unlock insights", "powerful", "intuitive" — none of these tell a user what happens when they click.
+- **Purge known AI/LLM lexical tells and stock idioms:**
+  - Overused verbs: `delve`, `navigate the complexities of`, `foster`, `harness`, `streamline`, `embark`, `unleash`, `elevate`, `champion`.
+  - Overused nouns: `tapestry`, `testament to`, `beacon`, `pinnacle`, `paradigm`, `synergy`, `game-changer`.
+  - Overused adjectives & adverbs: `seamless`, `seamlessly`, `transformative`, `cutting-edge`, `holistic`, `multifaceted`, `nuanced`.
+  - Stock stock-photo idioms: `"in today's fast-paced world"`, `"at the intersection of X and Y"`, `"a testament to the power of"`.
+  - Sycophantic conversational bookends: `"Certainly!"`, `"Great choice!"`, `"I'd be happy to help!"` — get directly to the work.
+  - The rule-of-three trap: triplet adjective strings ("intuitive, seamless, and powerful", "fast, flexible, and scalable").
 - **Replace abstract qualifiers with the concrete thing.** Instead of "experience seamless productivity", say what the button does: "Create project". Instead of "powerful analytics", name the chart and the unit: "Daily active users".
 - **Cut elements without a reason.** A decorative hero gradient with no information; a four-tile "feature" grid that duplicates the primary nav; a third CTA. If it does not serve a user task, a state, or a downstream action, remove it.
 - **Aesthetic does not excuse density, but density does not justify clutter either.** Both are easier than restraint.

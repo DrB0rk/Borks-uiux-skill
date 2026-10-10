@@ -4,14 +4,23 @@
 const MARKETING_FILLER_PATTERNS = [
   /\bstreamline your workflow\b/i,
   /\bunlock (actionable )?insights?\b/i,
-  /\bseamless (experience|integration|productivity)\b/i,
+  /\bseamless(ly)?\b/i,
   /\beverything you need\b/i,
   /\bbuilt for modern teams\b/i,
-  /\bexperience seamless\b/i,
   /\ball-in-one platform\b/i,
   /\bnext-gen(eration)?\b/i,
   /\brevolutionize your\b/i,
   /\bcutting-edge\b/i,
+  /\bdelve\b/i,
+  /\btapestry of\b/i,
+  /\bstands as a testament\b/i,
+  /\bharness(ing)? the power\b/i,
+  /\belevat(e|ing) your\b/i,
+  /\bfoster(ing)? (innovation|collaboration|growth)\b/i,
+  /\bin today'?s fast-paced world\b/i,
+  /\bgame-changer\b/i,
+  /\btransformative (experience|journey|solution)\b/i,
+  /\bunleash(ing)?\b/i,
 ];
 
 const AMBIGUOUS_LINK_TEXT = [
@@ -257,6 +266,44 @@ export function auditHtml(snippet, options = {}) {
         message: `Generic marketing filler phrase detected: "${match[0]}".`,
         snippetText: match[0],
         suggestion: "Replace with concrete, domain-specific text explaining what the user will actually see or do.",
+      });
+    }
+  }
+
+  // 10. Color-only status indicator: empty dot/pill using color classes with no text or label
+  const colorDotRegex = /<(span|div|i)\b([^>]*\b(bg-(red|green|emerald|amber|yellow|blue)-[0-9]{3}|status-(dot|indicator)|badge-dot)[^>]*)>([\s\S]*?)<\/\1>/gi;
+  let dotMatch;
+  while ((dotMatch = colorDotRegex.exec(snippet)) !== null) {
+    const [fullTag, tagType, attrs, colorClass] = dotMatch;
+    const hasAriaLabel = /\baria-label\s*=\s*["'][^"']+["']/i.test(attrs);
+    const hasAriaHidden = /\baria-hidden\s*=\s*["']true["']/i.test(attrs);
+    const inner = dotMatch[6] || "";
+    const textContent = inner.replace(/<[^>]+>/g, "").trim();
+
+    if (!hasAriaLabel && !hasAriaHidden && !textContent) {
+      addIssue({
+        id: "color-only-status",
+        severity: "high",
+        rule: "WCAG 1.4.1 Use of Color & CVD Ergonomics",
+        message: `Status indicator uses color (${colorClass}) as the sole carrier of meaning with no accessible label or accompanying text. Users with Color Vision Deficiency (CVD, ~8% of men) cannot reliably distinguish state.`,
+        snippetText: fullTag,
+        suggestion: "Pair the color dot with a text label (e.g. 'Active', 'Offline') or add an aria-label and distinct icon shape.",
+      });
+    }
+  }
+
+  // 11. Unmotivated sparkle iconography on search / input
+  const sparkleSearchRegex = /<(button|span|div)\b[^>]*>\s*(?:✨|<(?:svg|i|Lucide)[^>]*\b(?:sparkle|sparkles|magic|stars?)\b[^>]*>)\s*<\/\1>/gi;
+  let sparkleMatch;
+  while ((sparkleMatch = sparkleSearchRegex.exec(snippet)) !== null) {
+    if (/(search|filter|find|query)/i.test(snippet)) {
+      addIssue({
+        id: "unmotivated-ai-sparkle",
+        severity: "low",
+        rule: "AI Visual Tells & Honest Choice Architecture",
+        message: "Sparkle icon (✨ / Sparkles) placed on search or filter control without explaining what AI capability it performs.",
+        snippetText: sparkleMatch[0],
+        suggestion: "Use standard search iconography (e.g. magnifying glass) unless triggering a distinct, explained generative action.",
       });
     }
   }

@@ -70,7 +70,8 @@ Example of a *conceptual* source token representation (validate exact syntax aga
 
 - Define roles such as page heading, section heading, body, label, supportive text, code/data, and caption.
 - Reserve expressive typography for places where it helps product identity; prioritize stable metrics, readability and glyph coverage in dense software.
-- Use readable line length, clearly separated paragraphs and meaningful emphasis. Test actual fonts at typical device scale.
+- **Optimal line length (measure):** Constrain prose reading line length to **45–75 characters per line** (approximately `max-width: 65ch` in CSS). Lines longer than 75ch cause eye re-tracking fatigue at line breaks; lines under 45ch break reading rhythm excessively.
+- **Line-height calibration:** Calibrate line heights to type role: tight `1.15–1.25` for large display headings, comfortable `1.5–1.6` for body prose, and generous `1.6–1.8` for aging adults or cognitive accessibility. Use readable, clearly separated paragraphs and meaningful emphasis. Test actual fonts at typical device scale.
 - Use tabular figures for columns of numeric data and aligned decimal formats when relevant.
 - Internationalize numbers, dates, currency, pluralization and casing instead of hard-coding English assumptions.
 

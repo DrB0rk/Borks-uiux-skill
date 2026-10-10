@@ -4,7 +4,7 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-6EA8FF?style=flat-square"></a>
-  <img alt="Skill files" src="https://img.shields.io/badge/skill-15%20files-8F7CFF?style=flat-square">
+  <img alt="Skill files" src="https://img.shields.io/badge/skill-16%20files-8F7CFF?style=flat-square">
   <img alt="No runtime dependencies" src="https://img.shields.io/badge/dependencies-none-3FB950?style=flat-square">
 </p>
 
@@ -201,6 +201,7 @@ skills/b0rks-uiux/
 │   ├── standards-targets.md      # Verified WCAG / performance thresholds
 │   ├── ai-assisted-ui.md         # Homogenisation signals, de-genericisation, risk rubric
 │   ├── project-memory.md         # Per-project .b0x rejections and preferences
+│   ├── user-cognition-interaction.md # Color science, CVD ergonomics, scanning patterns, audience models
 │   └── sources.md                # Provenance and per-source verification status
 └── agents/
     └── openai.yaml               # Display metadata for OpenAI-compatible hosts
@@ -237,7 +238,7 @@ Verify it registered:
 
 ```bash
 omp plugin list
-# ● b0rks-uiux-skill@0.9.0
+# ● b0rks-uiux-skill@1.0.0
 ```
 
 Restart OMP after installation. The skill is then available as `b0rks-uiux`. Hosts bundling older copies must migrate explicitly — `b0rks-uiux` is a new identifier, not a backward-compatible alias for `bizar-uiux`.

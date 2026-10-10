@@ -2,7 +2,7 @@
 name: b0rks-uiux
 description: Research, design, implement, audit, and validate UI/UX in web, mobile, and developer tools. Use for frontend coding, interface design, redesigns, responsive layouts, design systems and tokens, component interactions, agent/chat interfaces, forms, accessibility, content design, keyboard usability, interaction state modeling, performance, and AI-generated UI quality review. Produce evidence-backed fixes, complete states, and practical verification rather than generic visual polish.
 metadata:
-  version: 0.9.0
+  version: 1.0.0
 ---
 
 # B0rk's UI/UX SKILL
@@ -12,7 +12,7 @@ Use this skill to turn interface work into explicit, testable design decisions i
 ## Operating model
 
 0. If the `b0x_*` MCP tools are available, call `b0x_context` (optionally passing `role: "ui-engineer"`, `"ui-auditor"`, `"content-designer"`, `"motion-specialist"`, or `"accessibility-specialist"`) before proposing anything. The b0x repository provides global engineering roles and universal baseline constraints that govern all work, layered with any project-specific overrides. Follow [project-memory.md](references/project-memory.md).
-1. Identify the user's primary goal, context, device, and likely level of familiarity.
+1. Identify the user's primary goal, context of use, device, and target group (B2B power user, B2C consumer, aging adult, novice). Consult [user-cognition-interaction.md](references/user-cognition-interaction.md) for audience-calibrated density, scanning mechanics, and CVD ergonomics.
 2. Inspect the actual interface, flow, component tree, screenshots, code, or requirements before recommending changes.
 3. Find the highest-friction moments first: uncertainty, too many choices, poor target sizing, weak hierarchy, hidden state, long waits, unclear grouping, or broken conventions.
 4. Map each material problem to one or more relevant principles from [principles.md](references/principles.md).
@@ -29,7 +29,7 @@ Use this skill to turn interface work into explicit, testable design decisions i
    - If a diagnostic audit issue was resolved (`b0x_check_*`), call `b0x_learn_from_audit` to permanently record the verified fix so the defect is never repeated.
    - Never finish a turn leaving explicit user corrections unlearned.
 
-For design or implementation tasks, follow [agent-workflow.md](references/agent-workflow.md), using its intent contract, state model, design envelope and explicit verification reporting. For real controls consult [interaction-patterns.md](references/interaction-patterns.md). For visual-system, icons or responsive changes consult [design-systems.md](references/design-systems.md) — it also carries the rule to use a maintained icon set such as Lucide rather than hand-drawn SVG. For animation, shadows, glow, morphing or motion accessibility consult [motion-effects.md](references/motion-effects.md). For content, consent, permission or cognitive clarity consult [content-trust-ethics.md](references/content-trust-ethics.md). For QA and testing consult [evaluation-playbook.md](references/evaluation-playbook.md). For global roles and project-specific memory consult [project-memory.md](references/project-memory.md). These are selectively loaded task guides, not mandatory reading for every trivial request.
+For design or implementation tasks, follow [agent-workflow.md](references/agent-workflow.md), using its intent contract, state model, design envelope and explicit verification reporting. For real controls consult [interaction-patterns.md](references/interaction-patterns.md). For visual-system, icons or responsive changes consult [design-systems.md](references/design-systems.md) — it also carries the rule to use a maintained icon set such as Lucide rather than hand-drawn SVG. For animation, shadows, glow, morphing or motion accessibility consult [motion-effects.md](references/motion-effects.md). For content, consent, permission or cognitive clarity consult [content-trust-ethics.md](references/content-trust-ethics.md). For QA and testing consult [evaluation-playbook.md](references/evaluation-playbook.md). For color perception science, CVD dual-encoding, eye-tracking scanning patterns (F/Z/Gutenberg) and target group models consult [user-cognition-interaction.md](references/user-cognition-interaction.md). For global roles and project-specific memory consult [project-memory.md](references/project-memory.md). These are selectively loaded task guides, not mandatory reading for every trivial request.
 
 When a finding needs a threshold rather than an opinion, take the number from [standards-targets.md](references/standards-targets.md) instead of asserting what feels adequate. When reviewing agent-generated or visibly generic output, read [ai-assisted-ui.md](references/ai-assisted-ui.md).
 

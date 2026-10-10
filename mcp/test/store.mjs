@@ -42,8 +42,8 @@ console.log("=== global repository roles & baseline rules ===");
   check("getRole('ui-engineer') returns directives", Array.isArray(role?.directives) && role.directives.length > 0);
 
   const baseline = S.getGlobalBaseline();
-  check("baseline rejections exist", Array.isArray(baseline.rejections) && baseline.rejections.length >= 8);
-  check("baseline preferences exist", Array.isArray(baseline.preferences) && baseline.preferences.length >= 12);
+  check("baseline rejections exist", Array.isArray(baseline.rejections) && baseline.rejections.length >= 10);
+  check("baseline preferences exist", Array.isArray(baseline.preferences) && baseline.preferences.length >= 15);
 
   const rejTexts = baseline.rejections.map((e) => e.text);
   check("baseline rejects hand-drawn SVG icons", rejTexts.some((t) => t.includes("Lucide")));
@@ -54,6 +54,8 @@ console.log("=== global repository roles & baseline rules ===");
   check("baseline rejects fake trust signals", rejTexts.some((t) => t.includes("fake urgency") || t.includes("trust signals")));
   check("baseline rejects layout-thrash animations", rejTexts.some((t) => t.includes("layout-triggering")));
   check("baseline rejects streaming AI jitter", rejTexts.some((t) => t.includes("scroll-anchoring")));
+  check("baseline rejects color as sole carrier", rejTexts.some((t) => t.includes("sole carrier") && t.includes("CVD")));
+  check("baseline rejects dark mode halation", rejTexts.some((t) => t.includes("halation")));
 
   const prefTexts = baseline.preferences.map((e) => e.text);
   check("baseline prefers oklch colors", prefTexts.some((t) => t.includes("oklch")));
@@ -61,6 +63,9 @@ console.log("=== global repository roles & baseline rules ===");
   check("baseline prefers Popover API", prefTexts.some((t) => t.includes("Popover API")));
   check("baseline prefers INP performance", prefTexts.some((t) => t.includes("INP")));
   check("baseline prefers linear() spring physics", prefTexts.some((t) => t.includes("linear()")));
+  check("baseline prefers 60-30-10 palette architecture", prefTexts.some((t) => t.includes("60-30-10")));
+  check("baseline prefers scanning visual anchors", prefTexts.some((t) => t.includes("F-pattern")));
+  check("baseline prefers audience-calibrated density", prefTexts.some((t) => t.includes("B2B") && t.includes("density")));
 }
 
 console.log("=== loadMerged: repository baseline + project memory ===");
@@ -70,10 +75,10 @@ console.log("=== loadMerged: repository baseline + project memory ===");
   S.append(root, S.normalise({ kind: "preference", text: "Project specific preference 1" }));
 
   const merged = S.loadMerged(root);
-  check("merged contains globalRepo rejections", merged.globalRepo.rejections.length >= 8);
-  check("merged contains globalRepo preferences", merged.globalRepo.preferences.length >= 12);
+  check("merged contains globalRepo rejections", merged.globalRepo.rejections.length >= 10);
+  check("merged contains globalRepo preferences", merged.globalRepo.preferences.length >= 15);
   check("merged contains project entries", merged.project.length === 1);
-  check("merged all combines both", merged.all.length >= 21);
+  check("merged all combines both", merged.all.length >= 26);
   fs.rmSync(root, { recursive: true, force: true });
 }
 
@@ -279,6 +284,38 @@ console.log("=== learnEntry: auto-deduplication, reinforcement, and conflict sup
   check("new preference is active", currentEntries[0].text === eConf.text);
 
   fs.rmSync(root, { recursive: true, force: true });
+}
+console.log("=== contrast.js: CVD simulations, halation, and 60-30-10 balance ===");
+{
+  const C = await import("../src/tools/contrast.js");
+  const red = { r: 239, g: 68, b: 68 };
+  const deut = C.simulateCvd(red, "deuteranopia");
+  check("CVD deuteranopia transforms red channel", deut.r !== red.r && deut.g > 150);
+
+  const prot = C.simulateCvd(red, "protanopia");
+  check("CVD protanopia transforms red channel", prot.r !== red.r);
+
+  const hal = C.auditContrast("#ffffff", "#000000");
+  check("dark mode halation warning triggered on pure white on black", Boolean(hal.halationWarning));
+  check("  and includes 18:1 warning text", hal.halationWarning.includes("Extreme contrast in dark mode"));
+
+  const normalContrast = C.auditContrast("#f1f5f9", "#0f172a");
+  check("off-white on deep slate has no halation warning", !normalContrast.halationWarning);
+  check("  and provides CVD simulation results", Boolean(normalContrast.colorVisionDeficiency?.deuteranopia));
+
+  const balanced = C.auditPaletteBalance({
+    surface: ["#0f172a"],
+    structural: ["#1e293b", "#334155"],
+    accent: ["#38bdf8"],
+  });
+  check("60-30-10 balanced with single accent", balanced.balanced === true);
+
+  const creep = C.auditPaletteBalance({
+    surface: ["#0f172a"],
+    structural: ["#1e293b"],
+    accent: ["#38bdf8", "#f43f5e", "#10b981"],
+  });
+  check("60-30-10 flags accent creep with >2 accents", creep.balanced === false && creep.warnings.length > 0);
 }
 
 console.log(failures === 0 ? "\nAll store tests passed." : `\n${failures} check(s) FAILED.`);
