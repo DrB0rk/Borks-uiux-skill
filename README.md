@@ -169,21 +169,15 @@ It is also explicit about what *must never* be used as an accusation: a common f
 
 ## OMP comparison benchmark
 
-Both OMP runs used MiniMax M3.1 Flash Preview at low thinking and the exact same prompt below. The baseline used `--no-skills`; the plugin run used `--skills b0rks-uiux`. Each run generated three standalone HTML apps with distinct layouts, visual identities, and interactions. Screenshots show the initial 1440 × 1000 viewport.
+Each app was generated in two separate OMP sessions on MiniMax M3.1 Flash Preview at low thinking: one without skills (`--no-skills`) and one with the B0rk UI/UX skill (`--skills b0rks-uiux`). The exact same app-specific prompt was used for each pair. Each session built and verified one standalone HTML app, then completed one issue pass and reran affected checks. Screenshots show the initial 1440 × 1000 view.
+
+### Morrow Coffee
 
 **Prompt used for both runs:**
 
 ```text
-Build three standalone, responsive web apps as `coffee.html`, `planner.html`, and `books.html`. Keep each app self-contained in one HTML file with inline CSS/JS and no external assets, libraries, or network requests. Give them clearly different layouts, visual identities, and interactions; don't reuse one template or just recolor it.
-
-- Morrow Coffee: a warm, editorial pickup-order storefront. Let people choose among three drinks, adjust quantity, choose a pickup time, enter a name, place the order, and see confirmation.
-- Daymark: a cool, focused daily planner with a time-based agenda and separate focus panel. Let people add, complete, delete, and filter tasks; show progress that updates.
-- Papertrail Books: a dark, data-dense bookstore dashboard with KPI strip, date-range controls, chart, and ranked books table. Make date-range and chart metric controls update the displayed data.
-
-Make the first 1440×1000 view useful and polished. Then verify all three apps in Chromium with `agent-browser`: check layout at 1440×1000 and 390×844, test every listed interaction with real clicks/keyboard input, check for horizontal overflow and browser errors, and fix any defects you find. Repeat the checks after fixes. Do not claim a check passed unless you performed it. Save the three HTML files in the current directory and report the checks and any limitations.
+Build `coffee.html`, a complete single-file pickup-order app for Morrow Coffee. Design it as a warm, editorial storefront with a drink menu and a clear order ticket. Customers must be able to choose a drink, change quantity, choose a pickup slot, enter a name, see the total, submit, and start another order. Handle missing names and quantity limits. Use inline CSS/JS only; no external assets or network calls. Make it responsive and keyboard accessible. After implementation, do one issue pass: use Chromium with `agent-browser` at 1440×1000 and 390×844, exercise every order flow, check overflow and browser errors, fix defects, then rerun affected checks. Report only checks actually performed and any limits.
 ```
-
-### Morrow Coffee
 
 <table>
   <tr><th>Without plugin</th><th>With plugin</th></tr>
@@ -195,6 +189,12 @@ Make the first 1440×1000 view useful and polished. Then verify all three apps i
 
 ### Daymark planner
 
+**Prompt used for both runs:**
+
+```text
+Build `planner.html`, a complete single-file daily task planner called Daymark. Give it a focused timeline layout with a compact task agenda, a separate focus/progress panel, and a cool slate-and-cyan visual identity. Users must be able to add, complete, delete, and filter tasks; progress and time groups must update correctly. Handle empty input and empty groups. Use inline CSS/JS only; no external assets or network calls. Make it responsive and keyboard accessible. After implementation, do one issue pass: use Chromium with `agent-browser` at 1440×1000 and 390×844, exercise every task flow, check overflow and browser errors, fix defects, then rerun affected checks. Report only checks actually performed and any limits.
+```
+
 <table>
   <tr><th>Without plugin</th><th>With plugin</th></tr>
   <tr>
@@ -205,6 +205,12 @@ Make the first 1440×1000 view useful and polished. Then verify all three apps i
 
 ### Papertrail Books
 
+**Prompt used for both runs:**
+
+```text
+Build `books.html`, a complete single-file sales dashboard for Papertrail Books. Use a dense, dark data-dashboard layout with a distinct purple-and-teal chart palette. Include KPI cards, a date-range control, a revenue/units metric switch, a chart, and a ranked books table. Use deterministic sample data. Date range and metric changes must update the KPIs and chart; table columns must sort; CSV export must download usable data. Use inline CSS/JS only; no external assets or network calls. Make it responsive and keyboard accessible. After implementation, do one issue pass: use Chromium with `agent-browser` at 1440×1000 and 390×844, exercise every dashboard control, check overflow and browser errors, fix defects, then rerun affected checks. Report only checks actually performed and any limits.
+```
+
 <table>
   <tr><th>Without plugin</th><th>With plugin</th></tr>
   <tr>
@@ -213,11 +219,11 @@ Make the first 1440×1000 view useful and polished. Then verify all three apps i
   </tr>
 </table>
 
-### OMP verification
+### Verification
 
-OMP reports that both versions were checked in Chromium at 1440 × 1000 and 390 × 844, with no horizontal overflow or page errors. It exercised ordering, task management, date ranges, chart metrics, sorting, and export; it found and fixed defects in order confirmation, planner scheduling, dashboard metrics, date handling, and mobile layout. I also manually submitted a plugin coffee order for three $5.75 drinks and confirmed the $17.25 total matched on the ticket and confirmation.
+OMP reports that all six apps were exercised in Chromium at 1440 × 1000 and 390 × 844, with defects fixed and affected checks rerun. Its checks covered ordering, task add/complete/delete/filter flows, dashboard ranges/metrics/sorting/CSV export, keyboard behavior, and page errors. In one final pass after OMP completed, I checked all six rendered files at both viewports: each had zero horizontal overflow and no browser errors. The three apps visibly use different layouts and visual identities.
 
-The checks covered Chromium only, with no screen-reader, Firefox, or WebKit pass. The native date-picker widget was not exercised; custom-date app logic was checked through keyboard input or change events. Dashboard data is synthetic, and coffee confirmation is local to the page.
+Limitations: Chromium only; no screen-reader, Firefox, or WebKit pass. Dashboard data is synthetic. Coffee orders are not sent to a backend; planner persistence differs by generated variant.
 
 ---
 
