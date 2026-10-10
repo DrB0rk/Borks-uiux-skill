@@ -169,37 +169,41 @@ It is also explicit about what *must never* be used as an accusation: a common f
 
 ## OMP comparison benchmark
 
-Both runs used OMP `v18.8.6`, MiniMax M3.1 Flash Preview at low thinking, and the exact same prompt below. One run with `--no-skills` generated the baseline; one with `--skills b0rks-uiux` generated the plugin version. Each produced three standalone HTML files using the same layout and theme. Screenshots show the initial 1440 × 1000 viewport.
+Both OMP runs used MiniMax M3.1 Flash Preview at low thinking and the exact same prompt below. The baseline used `--no-skills`; the plugin run used `--skills b0rks-uiux`. Each run generated three standalone HTML apps with distinct layouts, visual identities, and interactions. Screenshots show the initial 1440 × 1000 viewport.
 
 **Prompt used for both runs:**
 
 ```text
-Create three distinct, usable websites as three files: `site-coffee.html` (Morrow Coffee pickup ordering), `site-planner.html` (Daymark daily task planner), and `site-books.html` (Papertrail Books sales dashboard). Use exactly the same layout and visual theme on all three: warm ivory background, charcoal text, rust accent, muted sage secondary color, serif headings, sans-serif body, slim top navigation, title and description row, two-column main area with a wide content panel and narrow right summary/action panel, then a full-width lower panel. Keep spacing, typography, colors, borders, and component shapes consistent; vary only the content and controls needed by each site. Each site must be a complete, responsive single-file HTML document with inline CSS and JavaScript, no external assets, libraries, or network requests. Make the initial 1440x1000 view complete. Do not run tests or start a server; create the three files and finish.
+Build three standalone, responsive web apps as `coffee.html`, `planner.html`, and `books.html`. Keep each app self-contained in one HTML file with inline CSS/JS and no external assets, libraries, or network requests. Give them clearly different layouts, visual identities, and interactions; don't reuse one template or just recolor it.
+
+- Morrow Coffee: a warm, editorial pickup-order storefront. Let people choose among three drinks, adjust quantity, choose a pickup time, enter a name, place the order, and see confirmation.
+- Daymark: a cool, focused daily planner with a time-based agenda and separate focus panel. Let people add, complete, delete, and filter tasks; show progress that updates.
+- Papertrail Books: a dark, data-dense bookstore dashboard with KPI strip, date-range controls, chart, and ranked books table. Make date-range and chart metric controls update the displayed data.
+
+Make the first 1440×1000 view useful and polished. Then verify all three apps in Chromium with `agent-browser`: check layout at 1440×1000 and 390×844, test every listed interaction with real clicks/keyboard input, check for horizontal overflow and browser errors, and fix any defects you find. Repeat the checks after fixes. Do not claim a check passed unless you performed it. Save the three HTML files in the current directory and report the checks and any limitations.
 ```
 
-One generation per condition; this is a visual comparison, not a statistically reliable benchmark. Screenshots show rendered initial views and do not verify interactions or accessibility.
-
-### Morrow Coffee pickup
+### Morrow Coffee
 
 <table>
   <tr><th>Without plugin</th><th>With plugin</th></tr>
   <tr>
-    <td><img src="assets/benchmarks/1-baseline.png" alt="Morrow Coffee pickup page without the plugin" width="640"></td>
-    <td><img src="assets/benchmarks/1-plugin.png" alt="Morrow Coffee pickup page with the plugin" width="640"></td>
+    <td><img src="assets/benchmarks/1-baseline.png" alt="Morrow Coffee pickup app without the plugin" width="640"></td>
+    <td><img src="assets/benchmarks/1-plugin.png" alt="Morrow Coffee pickup app with the plugin" width="640"></td>
   </tr>
 </table>
 
-### Daymark task planner
+### Daymark planner
 
 <table>
   <tr><th>Without plugin</th><th>With plugin</th></tr>
   <tr>
-    <td><img src="assets/benchmarks/2-baseline.png" alt="Daymark task planner without the plugin" width="640"></td>
-    <td><img src="assets/benchmarks/2-plugin.png" alt="Daymark task planner with the plugin" width="640"></td>
+    <td><img src="assets/benchmarks/2-baseline.png" alt="Daymark daily planner without the plugin" width="640"></td>
+    <td><img src="assets/benchmarks/2-plugin.png" alt="Daymark daily planner with the plugin" width="640"></td>
   </tr>
 </table>
 
-### Papertrail Books dashboard
+### Papertrail Books
 
 <table>
   <tr><th>Without plugin</th><th>With plugin</th></tr>
@@ -208,6 +212,12 @@ One generation per condition; this is a visual comparison, not a statistically r
     <td><img src="assets/benchmarks/3-plugin.png" alt="Papertrail Books dashboard with the plugin" width="640"></td>
   </tr>
 </table>
+
+### OMP verification
+
+OMP reports that both versions were checked in Chromium at 1440 × 1000 and 390 × 844, with no horizontal overflow or page errors. It exercised ordering, task management, date ranges, chart metrics, sorting, and export; it found and fixed defects in order confirmation, planner scheduling, dashboard metrics, date handling, and mobile layout. I also manually submitted a plugin coffee order for three $5.75 drinks and confirmed the $17.25 total matched on the ticket and confirmation.
+
+The checks covered Chromium only, with no screen-reader, Firefox, or WebKit pass. The native date-picker widget was not exercised; custom-date app logic was checked through keyboard input or change events. Dashboard data is synthetic, and coffee confirmation is local to the page.
 
 ---
 
