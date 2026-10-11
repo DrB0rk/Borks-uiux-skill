@@ -1,84 +1,34 @@
 #!/usr/bin/env bash
-# Register the b0x MCP server with an OMP installation.
-#
-#   ./scripts/install-mcp.sh            # user scope  (~/.omp/agent/mcp.json)
-#   ./scripts/install-mcp.sh --project  # project scope (<repo>/.claude/mcp.json)
-#   ./scripts/install-mcp.sh --uninstall
-#
-# User scope is the default: the server is stateless, so one registration
-# serves every project. Per-project state lives in that project's .b0x/.
 set -euo pipefail
-
-REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-SERVER="$REPO_ROOT/mcp/src/index.js"
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+SERVER="$ROOT/mcp/src/index.js"
 NODE_BIN="$(command -v node || true)"
-
-ACTION="install"
-SCOPE="user"
+[[ -n "$NODE_BIN" && -f "$SERVER" ]] || { echo 'Node and MCP server are required' >&2; exit 1; }
+MODE=install; TARGET="${B0X_MCP_CONFIG:-}"
 for arg in "$@"; do
-  case "$arg" in
-    --uninstall) ACTION="uninstall" ;;
-    --project)   SCOPE="project" ;;
-    --user)      SCOPE="user" ;;
-    -h|--help)   sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
-    *) echo "unknown flag: $arg" >&2; exit 2 ;;
-  esac
+ case "$arg" in
+  --uninstall) MODE=uninstall;;
+  --user) [[ -n "$TARGET" ]] || TARGET="$HOME/.omp/agent/mcp.json";;
+  --project) [[ -n "$TARGET" ]] || TARGET="$(pwd)/.claude/mcp.json";;
+  --help|-h) echo 'Usage: B0X_MCP_CONFIG=/absolute/path/to/mcp.json install-mcp.sh [--uninstall|--user|--project]'; exit 0;;
+  *) echo "Unknown option $arg" >&2; exit 2;;
+ esac
 done
-
-[[ -n "$NODE_BIN" ]] || { echo "error: node not found on PATH" >&2; exit 1; }
-[[ -f "$SERVER" ]]  || { echo "error: server not found at $SERVER" >&2; exit 1; }
-
-if [[ "$SCOPE" == "user" ]]; then
-  TARGET="${HOME}/.omp/agent/mcp.json"
-else
-  # OMP reads project config from its project dir; .claude is the default for omp.
-  PROJECT_DIR="${B0X_PROJECT_DIR:-$(pwd)/.claude}"
-  TARGET="$PROJECT_DIR/mcp.json"
+[[ -n "$TARGET" ]] || { echo 'Set B0X_MCP_CONFIG to the verified OMP MCP config path, or explicitly use --user/--project after checking your OMP version.' >&2; exit 2; }
+if [[ "$MODE" == install && ! -d "$ROOT/mcp/node_modules/@modelcontextprotocol/sdk" ]]; then
+ (cd "$ROOT/mcp" && if command -v bun >/dev/null; then bun install --frozen-lockfile; else npm install --no-audit; fi)
 fi
-
-if [[ "$ACTION" == "uninstall" ]]; then
-  [[ -f "$TARGET" ]] || { echo "nothing to uninstall: $TARGET does not exist"; exit 0; }
-  node -e '
-    const fs = require("fs");
-    const f = process.argv[1];
-    const j = JSON.parse(fs.readFileSync(f, "utf8"));
-    if (j.mcpServers) delete j.mcpServers.b0x;
-    fs.writeFileSync(f, JSON.stringify(j, null, 2) + "\n");
-  ' "$TARGET"
-  echo "removed b0x from $TARGET"
-  exit 0
-fi
-
-# Install dependencies if the SDK is not already present.
-if [[ ! -d "$REPO_ROOT/mcp/node_modules/@modelcontextprotocol/sdk" ]]; then
-  echo "installing MCP dependencies..."
-  if command -v bun >/dev/null 2>&1; then
-    (cd "$REPO_ROOT/mcp" && bun install --silent)
-  else
-    (cd "$REPO_ROOT/mcp" && npm install --silent)
-  fi
-fi
-
 mkdir -p "$(dirname "$TARGET")"
-[[ -f "$TARGET" ]] || printf '{\n  "mcpServers": {}\n}\n' > "$TARGET"
-
-node -e '
-  const fs = require("fs");
-  const [file, command, server] = process.argv.slice(1);
-  const j = JSON.parse(fs.readFileSync(file, "utf8"));
-  j.mcpServers = j.mcpServers || {};
-  const prior = j.mcpServers.b0x;
-  j.mcpServers.b0x = { command, args: [server], type: "stdio" };
-  fs.writeFileSync(file, JSON.stringify(j, null, 2) + "\n");
-  if (prior && JSON.stringify(prior) !== JSON.stringify(j.mcpServers.b0x)) {
-    console.log("updated existing b0x entry (previous command pointed elsewhere)");
-  }
-' "$TARGET" "$NODE_BIN" "$SERVER"
-
-echo "registered b0x in $TARGET"
-echo
-echo "Verify with:   omp mcp list"
-echo "Then restart OMP so it picks the server up."
-echo
-echo "NOTE: .b0x/ holds per-project design feedback. It is not sensitive by"
-echo "default, but review it before committing - see mcp/README.md."
+node - "$TARGET" "$MODE" "$NODE_BIN" "$SERVER" <<'NODE'
+const fs=require('fs'),path=require('path');const [file,mode,command,server]=process.argv.slice(2);
+const original=fs.existsSync(file)?fs.readFileSync(file,'utf8'):null;
+const data=original?JSON.parse(original):{mcpServers:{}};
+if(!data||typeof data!=='object'||Array.isArray(data))throw Error('Expected JSON config object');
+if(data.mcpServers!==undefined&&(!data.mcpServers||typeof data.mcpServers!=='object'||Array.isArray(data.mcpServers)))throw Error('Invalid mcpServers object');
+data.mcpServers??={};
+if(mode==='uninstall'){delete data.mcpServers.b0x;}else{data.mcpServers.b0x={command,args:[server],type:'stdio'};}
+if(original!==null)fs.copyFileSync(file,file+'.b0x-backup');
+const temp=path.join(path.dirname(file),'.'+path.basename(file)+'.'+process.pid+'.tmp');
+try{fs.writeFileSync(temp,JSON.stringify(data,null,2)+'\n',{mode:0o600});fs.renameSync(temp,file);}finally{if(fs.existsSync(temp))fs.unlinkSync(temp);}
+console.log(mode==='install'?'Registered b0x MCP':'Removed b0x MCP',file);
+NODE
