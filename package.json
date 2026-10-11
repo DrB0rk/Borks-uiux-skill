@@ -1,6 +1,6 @@
 {
   "name": "b0rks-uiux-skill",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "B0rk's UI/UX SKILL: evidence-based UI/UX engineering, design systems, accessibility, validation and agent workflows.",
   "license": "MIT",
   "type": "module",
@@ -10,7 +10,11 @@
   "scripts": {
     "audit": "node ./scripts/audit-ui.js",
     "test": "node mcp/test/store.mjs",
-    "validate": "./scripts/validate.sh"
+    "validate": "./scripts/validate.sh",
+    "components:check": "tsc -p tsconfig.components.json --noEmit",
+    "components:build": "tsc -p tsconfig.components.json",
+    "components:dev": "node ./scripts/components-dev.mjs",
+    "components:test": "playwright test --config=playground/playwright.config.ts"
   },
   "keywords": [
     "omp",
@@ -35,7 +39,10 @@
     "scripts/validate.sh",
     "scripts/audit-ui.js",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "playground/",
+    "tsconfig.components.json",
+    "scripts/components-dev.mjs"
   ],
   "repository": {
     "type": "git",
@@ -53,5 +60,9 @@
     "skills": [
       "skills"
     ]
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.0",
+    "typescript": "^5.8.3"
   }
 }
