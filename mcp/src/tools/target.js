@@ -54,8 +54,8 @@ export function auditTargetSize({
   } else if (effectiveWidth >= WCAG_AA_MIN && effectiveHeight >= WCAG_AA_MIN) {
     wcagPass = true;
   } else if (effectiveSpacing >= (WCAG_AA_MIN - Math.min(effectiveWidth, effectiveHeight)) / 2) {
-    wcagPass = true;
-    wcagException = "Spacing: 24 CSS px diameter circle centered on bounding box does not intersect another target.";
+    wcagPass = false;
+    wcagException = "Indeterminate: a scalar spacing value cannot establish non-intersection with neighboring target geometry. Supply geometric evidence or enlarge the target.";
   }
 
   // Platform ergonomics
