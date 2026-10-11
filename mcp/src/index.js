@@ -17,11 +17,13 @@ import { auditContrast, auditPalette } from "./tools/contrast.js";
 import { auditTargetSize } from "./tools/target.js";
 import { auditHtml } from "./tools/html-lint.js";
 import { auditTokens } from "./tools/tokens-lint.js";
+import { readProjectFile, MARKUP_EXTENSIONS, TOKEN_EXTENSIONS } from "./tools/path-guard.js";
 import {
   KINDS,
   append,
   autoInit,
   distillFeedback,
+  findProject,
   findConflicts,
   getGlobalBaseline,
   getGlobalRoles,
@@ -262,15 +264,15 @@ server.registerTool(
   {
     title: "Automatically distill and learn from user design feedback",
     description:
-      "Automated learning engine: parses natural language user feedback or corrections (e.g. 'I don't like the button padding, make it 8px'), distills it into a clean directive, automatically detects kind (rejection/preference/praise) and domain tags, resolves conflicts by superseding outdated rules, or reinforces existing rules. Call this whenever the user gives feedback or corrects UI/UX choices.",
+      "Automated learning engine: parses natural language user feedback or corrections (e.g. 'I don't like the button padding, make it 8px'), distills it into a clean directive, classifies feedback and domain tags heuristically, proposes potential conflicts without silently deleting rules, and reinforces exact or near-duplicate rules. Call this whenever the user gives feedback or corrects UI/UX choices.",
     inputSchema: {
       feedback: z.string().min(1).describe("Natural language user feedback or correction"),
       context: z.string().optional().describe("Optional context hint about the screen or component (e.g. 'settings table', 'navigation bar')"),
       scope: z.enum(["project", "global"]).optional().describe("Storage scope: 'project' (default, local .b0x/) or 'global' (saves in user global ~/.b0x/)"),
-      autoSupersede: z.boolean().optional().describe("Automatically supersede conflicting earlier rules (default true)"),
+      autoSupersede: z.boolean().optional().describe("Request supersession; never deletes an unconfirmed conflict."),
     },
   },
-  async ({ feedback, context = "", scope = "project", autoSupersede = true }) => {
+  async ({ feedback, context = "", scope = "project", autoSupersede = false }) => {
     try {
       let targetRoot;
       if (scope === "global") {
@@ -464,12 +466,9 @@ server.registerTool(
     try {
       let code = snippet;
       if (!code && filePath) {
-        const proj = autoInit();
-        const fullPath = path.isAbsolute(filePath) ? filePath : path.join(proj.root || process.cwd(), filePath);
-        if (!fs.existsSync(fullPath)) {
-          return asText({ ok: false, error: `File not found: ${filePath}` });
-        }
-        code = fs.readFileSync(fullPath, "utf8");
+        const project = findProject();
+        if (!project.real) return asText({ ok: false, error: "Project root not found; pass a snippet or work inside a repository." });
+        code = readProjectFile(project.root, filePath, MARKUP_EXTENSIONS);
       }
       if (!code) {
         return asText({ ok: false, error: "Provide either a 'snippet' string or a 'filePath' relative to the project." });
@@ -496,12 +495,9 @@ server.registerTool(
     try {
       let data = tokens;
       if (!data && filePath) {
-        const proj = autoInit();
-        const fullPath = path.isAbsolute(filePath) ? filePath : path.join(proj.root || process.cwd(), filePath);
-        if (!fs.existsSync(fullPath)) {
-          return asText({ ok: false, error: `File not found: ${filePath}` });
-        }
-        data = JSON.parse(fs.readFileSync(fullPath, "utf8"));
+        const project = findProject();
+        if (!project.real) return asText({ ok: false, error: "Project root not found; pass tokens directly or work inside a repository." });
+        data = JSON.parse(readProjectFile(project.root, filePath, TOKEN_EXTENSIONS));
       }
       if (!data) {
         return asText({ ok: false, error: "Provide either a 'tokens' object or a 'filePath' relative to the project." });

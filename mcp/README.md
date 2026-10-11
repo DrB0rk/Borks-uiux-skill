@@ -70,7 +70,7 @@ Writes are atomic (temp file + rename), so an interrupted call cannot corrupt `e
 | `b0x_roles` | Inspect or list global roles (`ui-engineer`, `ui-auditor`, `content-designer`, `motion-specialist`, `accessibility-specialist`) |
 | `b0x_status` | Global repository roles/baseline status and project memory counts |
 | `b0x_context` | The unified snapshot to follow before designing. Supports optional `{ role }` spotlight. **Call first.** |
-| `b0x_learn` | **Automated learning engine:** distills conversational user feedback, auto-supersedes conflicting rules, increments reinforcement counter |
+| `b0x_learn` | **Automated learning engine:** distills conversational user feedback, flags conflicts for manual review, increments reinforcement counter |
 | `b0x_learn_from_audit` | Converts a verified diagnostic audit fix into an active project preference |
 | `b0x_record` | Manual fallback to store durable feedback (`scope: "project"` or `scope: "global"`) |
 | `b0x_list` | Inspect entries, with `kind` and `scope` filters (`all`, `global`, `project`) |
@@ -116,3 +116,9 @@ node mcp/test/e2e.mjs /tmp/project  # real MCP stdio protocol, tool surface
 ```
 
 `store.mjs` covers what the protocol test cannot easily prove: that concurrent processes do not lose entries, that pruning never drops a hard rejection first, that stale locks are reclaimed, that the log stays bounded, and that a corrupt store recovers.
+
+## File access boundary and learning safeguards
+
+The `b0x_check_html` and `b0x_check_tokens` tools now limit file reads to regular, size-capped, approved source files inside the detected Git project. Canonical path resolution rejects traversal and symlink escapes. Dot-env files, Git internals, node_modules and project memory are excluded. For checking arbitrary snippets use the `snippet` / `tokens` inputs instead of file paths.
+
+The automatic feedback distiller is heuristic. Confidence is no longer presented as categorically high. Potential conflicts are returned for review; unconfirmed matches do **not** silently delete existing instructions. Exact deletion is available through the explicit `b0x_forget` operation. Record feedback only if the user intended a durable design preference.

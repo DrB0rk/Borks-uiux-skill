@@ -160,6 +160,19 @@ export function getRelativeLuminance({ r, g, b }) {
 /**
  * Contrast ratio between two parsed colors (1 to 21).
  */
+/** Alpha blend straight sRGB channels; opaque output. */
+export function compositeColor(foreground, background) {
+  const alpha = Math.max(0, Math.min(1, foreground.a ?? 1));
+  const back = Math.max(0, Math.min(1, background.a ?? 1));
+  const outAlpha = alpha + back * (1 - alpha);
+  if (outAlpha === 0) return { r: 0, g: 0, b: 0, a: 0 };
+  const blended = {};
+  for (const channel of ["r", "g", "b"]) {
+    blended[channel] = (foreground[channel] * alpha + background[channel] * back * (1 - alpha)) / outAlpha;
+  }
+  return { ...blended, a: outAlpha };
+}
+
 export function getContrastRatio(colorA, colorB) {
   const l1 = getRelativeLuminance(colorA);
   const l2 = getRelativeLuminance(colorB);
@@ -260,9 +273,14 @@ export function auditContrast(foregroundStr, backgroundStr, role = "normal-text"
   const fg = parseColor(foregroundStr);
   const bg = parseColor(backgroundStr);
 
-  const ratio = Math.round(getContrastRatio(fg, bg) * 100) / 100;
-  const fgLum = Math.round(getRelativeLuminance(fg) * 1000) / 1000;
-  const bgLum = Math.round(getRelativeLuminance(bg) * 1000) / 1000;
+  // WCAG is computed on the visually composited colors, not raw RGB channels.
+  // When the background is translucent, assume a white canvas unless supplied
+  // by a future caller-specific implementation.
+  const background = compositeColor(bg, { r: 255, g: 255, b: 255 });
+  const foreground = compositeColor(fg, background);
+  const ratio = Math.round(getContrastRatio(foreground, background) * 100) / 100;
+  const fgLum = Math.round(getRelativeLuminance(foreground) * 1000) / 1000;
+  const bgLum = Math.round(getRelativeLuminance(background) * 1000) / 1000;
 
   const isLarge = role === "large-text";
   const isComponent = role === "ui-component" || role === "non-text";
@@ -276,8 +294,8 @@ export function auditContrast(foregroundStr, backgroundStr, role = "normal-text"
   // Color Vision Deficiency (CVD) Simulation checks
   const cvdSimulations = {};
   for (const cvdType of ["deuteranopia", "protanopia", "tritanopia", "achromatopsia"]) {
-    const simFg = simulateCvd(fg, cvdType);
-    const simBg = simulateCvd(bg, cvdType);
+    const simFg = simulateCvd(foreground, cvdType);
+    const simBg = simulateCvd(background, cvdType);
     const simRatio = Math.round(getContrastRatio(simFg, simBg) * 100) / 100;
     cvdSimulations[cvdType] = {
       contrastRatio: `${simRatio}:1`,
@@ -318,7 +336,7 @@ export function auditContrast(foregroundStr, backgroundStr, role = "normal-text"
   };
 
   if (!passesAA) {
-    const suggestion = suggestPassingColor(fg, bg, aaMin);
+    const suggestion = suggestPassingColor(foreground, background, aaMin);
     result.suggestion = {
       recommendedForeground: suggestion.hex,
       achievedRatio: `${suggestion.ratio}:1`,

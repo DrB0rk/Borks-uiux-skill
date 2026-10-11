@@ -530,14 +530,14 @@ export function distillFeedback(rawFeedback, contextHint = "") {
     directive: directive.slice(0, MAX_TEXT),
     raw: text,
     tags,
-    confidence: "high",
+    confidence: "uncertain",
   };
 }
 
 /**
  * Smart append that auto-deduplicates (increments reinforcement) and resolves conflicts.
  */
-export function learnEntry(root, entry, { autoSupersede = true } = {}) {
+export function learnEntry(root, entry, { autoSupersede = false } = {}) {
   return withLock(root, () => {
     ensure(root);
     const entries = load(root);
@@ -567,7 +567,7 @@ export function learnEntry(root, entry, { autoSupersede = true } = {}) {
     let superseded = [];
     let nextEntries = entries;
 
-    if (conflicts.length > 0 && autoSupersede) {
+    if (conflicts.length > 0 && autoSupersede && conflicts.every(c => c.confirmedSupersession === entry.id)) {
       const conflictIds = new Set(conflicts.map((c) => c.id));
       superseded = conflicts;
       nextEntries = entries.filter((e) => !conflictIds.has(e.id));

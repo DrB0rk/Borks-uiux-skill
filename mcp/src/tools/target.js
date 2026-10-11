@@ -54,8 +54,8 @@ export function auditTargetSize({
   } else if (effectiveWidth >= WCAG_AA_MIN && effectiveHeight >= WCAG_AA_MIN) {
     wcagPass = true;
   } else if (effectiveSpacing >= (WCAG_AA_MIN - Math.min(effectiveWidth, effectiveHeight)) / 2) {
-    wcagPass = true;
-    wcagException = "Spacing: 24 CSS px diameter circle centered on bounding box does not intersect another target.";
+    wcagPass = false;
+    wcagException = "Indeterminate: a scalar spacing value cannot establish non-intersection with neighboring target geometry. Supply geometric evidence or enlarge the target.";
   }
 
   // Platform ergonomics
@@ -96,7 +96,7 @@ export function auditTargetSize({
     const needX = Math.max(0, Math.ceil((WCAG_AA_MIN - effectiveWidth) / 2));
     const needY = Math.max(0, Math.ceil((WCAG_AA_MIN - effectiveHeight) / 2));
     recommendations.push(
-      `Fails WCAG 2.5.8 AA (${effectiveWidth}x${effectiveHeight}px < 24x24px). Add at least padding: ${needY}px ${needX}px or 12px perimeter spacing to pass conformance.`
+      `Fails WCAG 2.5.8 AA (${effectiveWidth}x${effectiveHeight}px < 24x24px). Add at least padding: ${needY}px ${needX}px; geometry-based spacing exceptions must be verified separately.`
     );
   }
   if (!passesApple) {

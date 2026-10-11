@@ -18,3 +18,7 @@ Use the gallery to test pointer and keyboard behavior, focus, DOM event payloads
 To add another component, write **one independent `.ts` file** under `skills/b0rks-uiux/assets/components/`, import it from `playground/playground.ts`, add one instance and a visible state output to `playground/index.html`, then add contract documentation to `references/component-library.md` and an interaction test. Do not add runtime dependencies or a duplicate gallery-only implementation.
 
 These examples are not form-associated custom elements. If FormData/validation is required, adapt to native light-DOM controls or implement ElementInternals and verify the form contract.
+
+## Regression matrix
+
+Playwright is configured for Chromium, Firefox and WebKit. Tests cover switch state and disabled behavior, native selection, keyboard-controlled segments, Escape and focus restoration, a disclosure, small-screen reflow, and forced-colors/reduced-motion smoke checks. Manual assistive-technology testing remains required for any production adaptation.

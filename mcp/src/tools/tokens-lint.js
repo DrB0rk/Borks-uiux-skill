@@ -24,9 +24,10 @@ export function auditTokens(tokensObj, options = {}) {
   };
 
   // Traverse token tree recursively
-  function walk(node, currentPath = []) {
+  function walk(node, currentPath = [], inheritedType = null) {
     if (!node || typeof node !== "object" || Array.isArray(node)) return;
 
+    const activeType = node.$type || inheritedType;
     // Check if this node is a token (has $value or legacy value)
     const hasDtcgValue = "$value" in node;
     const hasLegacyValue = "value" in node && !hasDtcgValue;
@@ -63,7 +64,7 @@ export function auditTokens(tokensObj, options = {}) {
       }
 
       // Check $type presence
-      if (hasDtcgValue && !("$type" in node)) {
+      if (hasDtcgValue && !activeType) {
         // Look up parent groups for an inherited $type
         addIssue({
           id: "missing-token-type",
@@ -91,7 +92,7 @@ export function auditTokens(tokensObj, options = {}) {
       // Recurse into child groups
       for (const [key, child] of Object.entries(node)) {
         if (!key.startsWith("$")) {
-          walk(child, [...currentPath, key]);
+          walk(child, [...currentPath, key], activeType);
         }
       }
     }

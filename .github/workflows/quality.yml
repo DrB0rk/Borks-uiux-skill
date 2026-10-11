@@ -1,0 +1,27 @@
+name: B0rk's UI/UX quality gates
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install
+      - run: npm --prefix mcp install
+      - run: npm run components:check
+      - run: npm run components:build
+      - run: node mcp/test/diagnostics.mjs
+      - run: npm test
+      - run: npm run validate
+      - run: npx playwright install --with-deps ${{ matrix.browser }}
+      - run: npx playwright test --config=playground/playwright.config.ts --project=${{ matrix.browser }}

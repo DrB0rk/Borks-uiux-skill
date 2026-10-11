@@ -2,7 +2,7 @@
 name: b0rks-uiux
 description: Research, design, implement, audit, and validate UI/UX in web, mobile, and developer tools. Use for frontend coding, interface design, redesigns, responsive layouts, design systems and tokens, component interactions, agent/chat interfaces, forms, accessibility, content design, keyboard usability, interaction state modeling, performance, and AI-generated UI quality review. Produce evidence-backed fixes, complete states, and practical verification rather than generic visual polish.
 metadata:
-  version: 1.1.0
+  version: 1.2.0
 ---
 
 # B0rk's UI/UX SKILL
@@ -25,7 +25,7 @@ Use this skill to turn interface work into explicit, testable design decisions i
    - In shell/CI contexts, run `./scripts/audit-ui.js` (`--contrast`, `--target`, `--html`, `--file`, `--tokens`).
 7. Validate the final result against the task-specific checklist in [review-checklist.md](references/review-checklist.md).
 8. **Automated learning and reflection loop:** Before completing the turn, check whether the user provided feedback, rejected a pattern, or expressed a design preference during this session.
-   - Call `b0x_learn({ feedback })` to automatically distill the feedback into a reusable directive, auto-supersede conflicting earlier rules, or increment the reinforcement counter on confirmed patterns.
+   - Call `b0x_learn({ feedback })` to automatically distill the feedback into a reusable directive, report potentially conflicting earlier rules for human review, or increment the reinforcement counter on confirmed patterns.
    - If a diagnostic audit issue was resolved (`b0x_check_*`), call `b0x_learn_from_audit` to permanently record the verified fix so the defect is never repeated.
    - Never finish a turn leaving explicit user corrections unlearned.
 
@@ -37,7 +37,7 @@ When a finding needs a threshold rather than an opinion, take the number from [s
 
 When the user rejects a design choice, corrects an element, or confirms a preference, that signal must be learned automatically:
 - **Call `b0x_learn({ feedback })`:** The tool automatically parses conversational input (e.g. *"I don't like the button padding, make it 8px"*), strips conversational noise, classifies the kind (`rejection`, `preference`, `praise`), extracts domain tags, and handles conflicts.
-- **Automatic conflict supersession:** If the new directive contradicts an earlier rule (e.g. changing cell padding from 16px to 8px), `b0x_learn` automatically supersedes the outdated rule, preventing conflicting instructions.
+- **Conflict review:** If the new directive contradicts an earlier rule (e.g. changing cell padding from 16px to 8px), `b0x_learn` automatically supersedes the outdated rule, preventing conflicting instructions.
 - **Reinforcement tracking:** Repeatedly expressed preferences increment a reinforcement counter (`reinforced ×N`), signaling strong project consensus.
 - **Diagnostic learning:** When an audit tool (`b0x_check_*`) detects an issue and an approved fix is applied, call `b0x_learn_from_audit` to permanently record the remedy so the defect is never repeated.
 

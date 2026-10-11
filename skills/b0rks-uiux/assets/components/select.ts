@@ -1,8 +1,14 @@
-/** Native select interaction example. Set .options array; event value-change. Not form-associated. */
+/**
+ * B0x native select: use the platform's native keyboard/touch picker.
+ * Properties: options, value, label, placeholder, disabled, required.
+ * Event: value-change({value}). Uses a native <select> inside Shadow DOM.
+ * Not form-associated with ancestor forms; use native controls or ElementInternals.
+ * Style through --b0x-border, --b0x-radius, --b0x-surface and ::part(select).
+ */
 export type SelectOption={value:string;label:string;disabled?:boolean};
 export class B0xSelect extends HTMLElement{
  static observedAttributes=['value','label','placeholder','disabled','required'];private control:HTMLSelectElement;private text:HTMLElement;private data:SelectOption[]=[];
- constructor(){super();const r=this.attachShadow({mode:'open'});r.innerHTML=`<style>:host{display:inline-block;font:inherit;color:var(--b0x-fg,inherit)}label{display:grid;gap:6px}span{font-weight:600;font-size:.85em}select{font:inherit;min-height:44px;min-width:170px;border:1px solid var(--b0x-border,#bdc6d2);border-radius:var(--b0x-radius,10px);padding:8px 12px;background:var(--b0x-surface,white);color:inherit}select:focus-visible{outline:3px solid var(--b0x-focus,#2868d9)}</style><label><span></span><select part="select"></select></label>`;this.control=r.querySelector('select')!;this.text=r.querySelector('span')!;this.control.addEventListener('change',()=>{this.value=this.control.value;this.dispatchEvent(new CustomEvent('value-change',{detail:{value:this.value},bubbles:true,composed:true}))});this.sync()}
+ constructor(){super();const r=this.attachShadow({mode:'open'});r.innerHTML=`<style>:host{display:inline-block;font:inherit;color:var(--b0x-fg,inherit)}label{display:grid;gap:6px}span{font-weight:600;font-size:.85em}select{font:inherit;min-height:44px;min-width:170px;border:1px solid var(--b0x-border,#bdc6d2);border-radius:var(--b0x-radius,10px);padding:8px 12px;background:var(--b0x-surface,white);color:inherit}select:focus-visible{outline:3px solid var(--b0x-focus,#2868d9)}@media(forced-colors:active){select:focus-visible{outline-color:Highlight}}</style><label><span></span><select part="select"></select></label>`;this.control=r.querySelector('select')!;this.text=r.querySelector('span')!;this.control.addEventListener('change',()=>{this.value=this.control.value;this.dispatchEvent(new CustomEvent('value-change',{detail:{value:this.value},bubbles:true,composed:true}))});this.sync()}
  get options(){return this.data.map(o=>({...o}))}set options(v:SelectOption[]){this.data=v.map(o=>({...o}));this.render()}
  get value(){return this.getAttribute('value')??''}set value(v:string){this.setAttribute('value',v)}
  get label(){return this.getAttribute('label')??'Choose an option'}set label(v:string){this.setAttribute('label',v)}

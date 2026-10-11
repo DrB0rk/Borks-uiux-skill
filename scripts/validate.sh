@@ -160,6 +160,13 @@ else
   printf '  \033[33mnote\033[0m  mcp dependencies absent, skipping test suites (run ./scripts/install-mcp.sh)\n'
 fi
 
+# Run component checks when development dependencies are installed.
+if [[ -x node_modules/.bin/tsc ]]; then
+  if npm run components:check; then ok "component TypeScript check"; else bad "component TypeScript check failed"; fi
+else
+  printf "  note  component dependencies unavailable; run npm install and npm run components:check before publishing\n"
+fi
+
 echo
 if [[ $fail -eq 0 ]]; then
   printf '\033[32mAll checks passed.\033[0m Safe to publish.\n'
