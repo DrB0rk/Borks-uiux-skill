@@ -264,7 +264,7 @@ server.registerTool(
   {
     title: "Automatically distill and learn from user design feedback",
     description:
-      "Automated learning engine: parses natural language user feedback or corrections (e.g. 'I don't like the button padding, make it 8px'), distills it into a clean directive, automatically detects kind (rejection/preference/praise) and domain tags, resolves conflicts by superseding outdated rules, or reinforces existing rules. Call this whenever the user gives feedback or corrects UI/UX choices.",
+      "Automated learning engine: parses natural language user feedback or corrections (e.g. 'I don't like the button padding, make it 8px'), distills it into a clean directive, classifies feedback and domain tags heuristically, proposes potential conflicts without silently deleting rules, and reinforces exact or near-duplicate rules. Call this whenever the user gives feedback or corrects UI/UX choices.",
     inputSchema: {
       feedback: z.string().min(1).describe("Natural language user feedback or correction"),
       context: z.string().optional().describe("Optional context hint about the screen or component (e.g. 'settings table', 'navigation bar')"),

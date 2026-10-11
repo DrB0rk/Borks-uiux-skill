@@ -70,7 +70,7 @@ Writes are atomic (temp file + rename), so an interrupted call cannot corrupt `e
 | `b0x_roles` | Inspect or list global roles (`ui-engineer`, `ui-auditor`, `content-designer`, `motion-specialist`, `accessibility-specialist`) |
 | `b0x_status` | Global repository roles/baseline status and project memory counts |
 | `b0x_context` | The unified snapshot to follow before designing. Supports optional `{ role }` spotlight. **Call first.** |
-| `b0x_learn` | **Automated learning engine:** distills conversational user feedback, auto-supersedes conflicting rules, increments reinforcement counter |
+| `b0x_learn` | **Automated learning engine:** distills conversational user feedback, flags conflicts for manual review, increments reinforcement counter |
 | `b0x_learn_from_audit` | Converts a verified diagnostic audit fix into an active project preference |
 | `b0x_record` | Manual fallback to store durable feedback (`scope: "project"` or `scope: "global"`) |
 | `b0x_list` | Inspect entries, with `kind` and `scope` filters (`all`, `global`, `project`) |
