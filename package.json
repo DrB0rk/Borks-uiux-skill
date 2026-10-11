@@ -10,7 +10,7 @@
   "scripts": {
     "audit": "node ./scripts/audit-ui.js",
     "test": "node mcp/test/store.mjs",
-    "validate": "./scripts/validate.sh",
+    "validate": "bash ./scripts/validate.sh",
     "components:check": "tsc -p tsconfig.components.json --noEmit",
     "components:build": "tsc -p tsconfig.components.json",
     "components:dev": "node ./scripts/components-dev.mjs",
