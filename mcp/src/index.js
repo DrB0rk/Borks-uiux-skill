@@ -17,11 +17,13 @@ import { auditContrast, auditPalette } from "./tools/contrast.js";
 import { auditTargetSize } from "./tools/target.js";
 import { auditHtml } from "./tools/html-lint.js";
 import { auditTokens } from "./tools/tokens-lint.js";
+import { readProjectFile, MARKUP_EXTENSIONS, TOKEN_EXTENSIONS } from "./tools/path-guard.js";
 import {
   KINDS,
   append,
   autoInit,
   distillFeedback,
+  findProject,
   findConflicts,
   getGlobalBaseline,
   getGlobalRoles,
@@ -464,12 +466,9 @@ server.registerTool(
     try {
       let code = snippet;
       if (!code && filePath) {
-        const proj = autoInit();
-        const fullPath = path.isAbsolute(filePath) ? filePath : path.join(proj.root || process.cwd(), filePath);
-        if (!fs.existsSync(fullPath)) {
-          return asText({ ok: false, error: `File not found: ${filePath}` });
-        }
-        code = fs.readFileSync(fullPath, "utf8");
+        const project = findProject();
+        if (!project.real) return asText({ ok: false, error: "Project root not found; pass a snippet or work inside a repository." });
+        code = readProjectFile(project.root, filePath, MARKUP_EXTENSIONS);
       }
       if (!code) {
         return asText({ ok: false, error: "Provide either a 'snippet' string or a 'filePath' relative to the project." });
@@ -496,12 +495,9 @@ server.registerTool(
     try {
       let data = tokens;
       if (!data && filePath) {
-        const proj = autoInit();
-        const fullPath = path.isAbsolute(filePath) ? filePath : path.join(proj.root || process.cwd(), filePath);
-        if (!fs.existsSync(fullPath)) {
-          return asText({ ok: false, error: `File not found: ${filePath}` });
-        }
-        data = JSON.parse(fs.readFileSync(fullPath, "utf8"));
+        const project = findProject();
+        if (!project.real) return asText({ ok: false, error: "Project root not found; pass tokens directly or work inside a repository." });
+        data = JSON.parse(readProjectFile(project.root, filePath, TOKEN_EXTENSIONS));
       }
       if (!data) {
         return asText({ ok: false, error: "Provide either a 'tokens' object or a 'filePath' relative to the project." });
