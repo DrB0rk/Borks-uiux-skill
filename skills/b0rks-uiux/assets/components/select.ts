@@ -1,4 +1,10 @@
-/** Native select interaction example. Set .options array; event value-change. Not form-associated. */
+/**
+ * B0x native select: use the platform's native keyboard/touch picker.
+ * Properties: options, value, label, placeholder, disabled, required.
+ * Event: value-change({value}). Uses a native <select> inside Shadow DOM.
+ * Not form-associated with ancestor forms; use native controls or ElementInternals.
+ * Style through --b0x-border, --b0x-radius, --b0x-surface and ::part(select).
+ */
 export type SelectOption={value:string;label:string;disabled?:boolean};
 export class B0xSelect extends HTMLElement{
  static observedAttributes=['value','label','placeholder','disabled','required'];private control:HTMLSelectElement;private text:HTMLElement;private data:SelectOption[]=[];

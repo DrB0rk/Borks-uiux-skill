@@ -30,3 +30,12 @@ test('320px reflow', async ({page}) => {
  await page.setViewportSize({width:320,height:800});
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
+
+test('menu stays operable after viewport resize',async({page})=>{
+ await page.setViewportSize({width:320,height:600});
+ const trigger=page.locator('b0x-dropdown-menu .trigger');
+ await trigger.click();
+ await expect(page.locator('b0x-dropdown-menu [role=menu]')).toBeVisible();
+ await page.keyboard.press('Escape');
+ await expect(trigger).toHaveAttribute('aria-expanded','false');
+});
