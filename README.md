@@ -524,3 +524,12 @@ TypeScript and Playwright are **development dependencies only**. Installing the 
 ### Quality gates and safe agent learning
 
 The component workbench now has a typed catalog and multi-browser Playwright configuration. A GitHub Actions workflow tests component compilation, MCP diagnostics and the skill validator. File-oriented MCP audits are confined to approved project files, feedback supersession requires explicit review, and accessibility calculations account for translucent foregrounds. Review [the component contracts](skills/b0rks-uiux/references/component-library.md) and [MCP security documentation](mcp/README.md) before adapting examples.
+
+
+### OMP integration and hosted preview
+
+The package provides an OMP skill via `omp.skills` and an independently installed `b0x` MCP stdio server; it does **not** register a native extension. See [the version-qualified OMP audit](docs/OMP-INTEGRATION-AUDIT.md). Validate actual MCP discovery with `omp mcp list` in the intended OMP environment. Use `B0X_MCP_CONFIG=/absolute/path/to/mcp.json ./scripts/install-mcp.sh` after verifying the current profile's config location.
+
+For a static, deployable copy of the actual component playground run `npm run components:preview`; it emits `preview-dist/`. Cloudflare Pages can use build command `npm install && npm run components:preview` and output directory `preview-dist`. No MCP server, local memory or OMP runtime is shipped in the static site.
+
+A separately hosted <a href="https://b0rks-uiux-workbench.berk-04d.workers.dev/">visual concept preview</a> demonstrates the interaction language, but does not execute the repository component TypeScript sources. The source-faithful static build remains the preferred hosted deliverable.
