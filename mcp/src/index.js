@@ -269,10 +269,10 @@ server.registerTool(
       feedback: z.string().min(1).describe("Natural language user feedback or correction"),
       context: z.string().optional().describe("Optional context hint about the screen or component (e.g. 'settings table', 'navigation bar')"),
       scope: z.enum(["project", "global"]).optional().describe("Storage scope: 'project' (default, local .b0x/) or 'global' (saves in user global ~/.b0x/)"),
-      autoSupersede: z.boolean().optional().describe("Automatically supersede conflicting earlier rules (default true)"),
+      autoSupersede: z.boolean().optional().describe("Request supersession; never deletes an unconfirmed conflict."),
     },
   },
-  async ({ feedback, context = "", scope = "project", autoSupersede = true }) => {
+  async ({ feedback, context = "", scope = "project", autoSupersede = false }) => {
     try {
       let targetRoot;
       if (scope === "global") {
