@@ -15,7 +15,7 @@ A skill that turns interface work into **explicit, testable design decisions** i
 Point your agent at a screen, a flow, or a component and this skill audits it against behavioral design principles — then proposes the *smallest* change that removes the friction. Every finding ties back to a named principle and an observable user consequence.
 
 > **What it is:** a set of instructions and reference material your AI agent loads on demand.
-> **What it isn't:** a component library, a CSS framework, or a design system. It has **zero runtime dependencies** — it works on any stack.
+> **What it isn't:** a production component library, a CSS framework, or a design system. It has **zero runtime dependencies** and works across stacks. The optional, source-editable TypeScript component examples are teaching/reference assets, not a mandated UI kit.
 
 ---
 
@@ -502,3 +502,20 @@ The artwork in `assets/banner.svg` dogfoods the skill. It uses a clear typograph
 The skill is an original synthesis informed by [Laws of UX](https://lawsofux.com/) (Jon Yablonski) and [Laws of UI](https://www.uilaws.com/), plus established usability research, normative accessibility standards, and peer-reviewed research on AI-generated interfaces. No source prose, examples, illustrations, or branded assets are reproduced — see [`references/sources.md`](skills/b0rks-uiux/references/sources.md) for the full provenance, per-source verification status, and licensing rationale.
 
 Accessibility content is engineering guidance, not legal advice.
+
+---
+
+## Editable component examples & live workbench
+
+Five **small, self-contained TypeScript examples** now ship *inside the skill assets* so coding agents can inspect, copy and adapt one primitive without introducing a component framework: **switch**, **segmented control**, **native select**, **command dropdown menu**, and **disclosure**. Every example has typed inputs and events, accessible keyboard behavior, CSS custom properties / Shadow Parts and usage limitations. They are **not production-ready drop-in form controls**; review the [component contracts and integration guidance](skills/b0rks-uiux/references/component-library.md) before reusing one.
+
+The repo includes a local interactive [component workbench](playground/README.md) which directly imports those same sources. It shows live state changes, keyboard interactions, event traces, light/dark themes, compact density and editable labels/tokens.
+
+```bash
+npm install
+npm run components:dev       # http://127.0.0.1:4173/playground/
+npm run components:check     # strict TypeScript check
+npm run components:test      # Playwright keyboard/pointer smoke tests
+```
+
+TypeScript and Playwright are **development dependencies only**. Installing the standalone skill does not install or run a UI library. The examples live in `skills/b0rks-uiux/assets/components/`, so they remain available after copying only the skill directory into an agent host.
