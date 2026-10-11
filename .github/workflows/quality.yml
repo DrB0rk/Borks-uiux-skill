@@ -18,6 +18,9 @@ jobs:
           node-version: '22'
       - run: npm install
       - run: npm --prefix mcp install
+      - run: node scripts/test-install-mcp.mjs
+      - run: npm run components:preview
+      - run: test -f preview-dist/playground/index.html && test -f preview-dist/playground/dist/playground/playground.js
       - run: npm run components:check
       - run: npm run components:build
       - run: node mcp/test/diagnostics.mjs
