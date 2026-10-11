@@ -26,3 +26,11 @@ el?.addEventListener('checked-change', e => {
 ```
 
 Read [interaction-patterns.md](interaction-patterns.md) before adapting semantics, and [playground/README.md](../../../playground/README.md) for interactive preview and tests. Verify keyboard and pointer navigation, focus, disabled states, screen readers, responsive layout, reduced motion, contrast, and events in the adapted project. The examples are teaching references, not an excuse to inject generic styling.
+
+## Workbench catalog metadata
+
+The gallery consumes `playground/registry.ts`: a typed catalog of component file names, live event contracts, labels and expected keys. The component implementations remain standalone. Adding a new example requires one independent TypeScript file, a registry entry and a preview fixture. Do not copy the registry into consumer applications.
+
+## Accessibility and form limitations
+
+The Shadow DOM examples are reference controls and are **not** form-associated by default. Choose native form elements for production submissions or implement `ElementInternals` in the adapted control. Test Windows forced colors, reduced motion, keyboard focus return, RTL where relevant, text enlargement and screen-reader announcements. Never report component test coverage as full WCAG conformance. The workbench is for inspection, not accessibility certification.

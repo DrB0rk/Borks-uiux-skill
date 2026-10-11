@@ -1,3 +1,4 @@
+import { COMPONENT_EXAMPLES } from './registry.js';
 import '../skills/b0rks-uiux/assets/components/switch.js';
 import '../skills/b0rks-uiux/assets/components/segmented-control.js';
 import '../skills/b0rks-uiux/assets/components/select.js';
@@ -15,7 +16,7 @@ sel.options=[{value:'low',label:'Low'},{value:'medium',label:'Medium'},{value:'h
 menu.items=[{id:'copy',label:'Duplicate project'},{id:'share',label:'Share project'},{id:'archive',label:'Archive',destructive:true}];
 const names:Record<string,HTMLElement>={sw,seg,sel,menu,disc};
 const eventLog=byId<HTMLOListElement>('log');
-for(const [id,event] of Object.entries({sw:'checked-change',seg:'value-change',sel:'value-change',menu:'action',disc:'open-change'})){
+for(const {id,event} of COMPONENT_EXAMPLES){
  names[id].addEventListener(event,e=>{
   const detail=(e as CustomEvent).detail;
   byId<HTMLOutputElement>('state-'+id).textContent=JSON.stringify(detail);
@@ -24,6 +25,8 @@ for(const [id,event] of Object.entries({sw:'checked-change',seg:'value-change',s
  });
 }
 const target=byId<HTMLSelectElement>('target'),label=byId<HTMLInputElement>('label'),disabled=byId<HTMLInputElement>('disabled');
+const registryEntries=COMPONENT_EXAMPLES.map(c=>({value:c.id,label:c.name}));
+target.replaceChildren(...registryEntries.map(c=>{const option=document.createElement('option');option.value=c.value;option.textContent=c.label;return option;}));
 function sync(){const el=names[target.value] as HTMLElement&{label:string;disabled?:boolean};label.value=el.label;disabled.checked=!!el.disabled;disabled.disabled=!('disabled'in el);}
 target.addEventListener('change',sync);
 label.addEventListener('input',()=>{(names[target.value] as typeof sw).label=label.value});

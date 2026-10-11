@@ -519,3 +519,8 @@ npm run components:test      # Playwright keyboard/pointer smoke tests
 ```
 
 TypeScript and Playwright are **development dependencies only**. Installing the standalone skill does not install or run a UI library. The examples live in `skills/b0rks-uiux/assets/components/`, so they remain available after copying only the skill directory into an agent host.
+
+
+### Quality gates and safe agent learning
+
+The component workbench now has a typed catalog and multi-browser Playwright configuration. A GitHub Actions workflow tests component compilation, MCP diagnostics and the skill validator. File-oriented MCP audits are confined to approved project files, feedback supersession requires explicit review, and accessibility calculations account for translucent foregrounds. Review [the component contracts](skills/b0rks-uiux/references/component-library.md) and [MCP security documentation](mcp/README.md) before adapting examples.
