@@ -6,3 +6,27 @@ test('select native change',async({page})=>{await page.locator('b0x-select selec
 test('menu focus and action',async({page})=>{const m=page.locator('b0x-dropdown-menu');const b=m.locator('.trigger');await b.press('ArrowDown');await expect(b).toHaveAttribute('aria-expanded','true');await page.keyboard.press('ArrowDown');await page.keyboard.press('Enter');await expect(page.locator('#state-menu')).toContainText('share');await b.press('ArrowDown');await page.keyboard.press('Escape');await expect(b).toHaveAttribute('aria-expanded','false')});
 test('disclosure and inspector',async({page})=>{const d=page.locator('b0x-disclosure details');await d.locator('summary').press('Enter');await expect(d).toHaveAttribute('open');await page.locator('#label').fill('Custom toggle');await expect(page.locator('b0x-switch [part=label]')).toHaveText('Custom toggle')});
 test('mobile no horizontal overflow',async({page})=>{await page.setViewportSize({width:375,height:812});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true)});
+
+test('disabled switch rejects activation', async ({page}) => {
+ await page.locator('#target').selectOption('sw');
+ await page.locator('#disabled').check();
+ const button=page.locator('b0x-switch button');
+ await expect(button).toBeDisabled();
+ await expect(button).toHaveAttribute('aria-checked','true');
+});
+test('menu Escape restores focus', async ({page}) => {
+ const trigger=page.locator('b0x-dropdown-menu .trigger');
+ await trigger.focus();
+ await trigger.press('ArrowDown');
+ await page.keyboard.press('Escape');
+ await expect(trigger).toBeFocused();
+});
+test('reduced motion and forced colors do not hide controls', async ({page}) => {
+ await page.emulateMedia({reducedMotion:'reduce',forcedColors:'active'});
+ await expect(page.locator('b0x-switch button')).toBeVisible();
+ await expect(page.locator('b0x-select select')).toBeVisible();
+});
+test('320px reflow', async ({page}) => {
+ await page.setViewportSize({width:320,height:800});
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
