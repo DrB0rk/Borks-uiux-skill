@@ -280,8 +280,8 @@ console.log("=== learnEntry: auto-deduplication, reinforcement, and conflict sup
   check("unconfirmed conflict is preserved", a3.action === "added");
   check("unconfirmed conflicts are reported", a3.conflicts.some((s) => s.id === e1.id));
   const currentEntries = S.load(root);
-  check("only 1 active entry remains", currentEntries.length === 1);
-  check("new preference is active", currentEntries[0].text === eConf.text);
+  check("both conflicting rules remain until reviewed", currentEntries.length === 2);
+  check("new preference is present", currentEntries.some(e => e.text === eConf.text));
 
   fs.rmSync(root, { recursive: true, force: true });
 }
