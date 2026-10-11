@@ -26,6 +26,9 @@ If you cannot state the observable user consequence of your guidance, it is a pr
 | Tokens, visual system, responsive rules | `skills/b0rks-uiux/references/design-systems.md` |
 | Content, consent, permission, cognitive clarity | `skills/b0rks-uiux/references/content-trust-ethics.md` |
 | QA strategy and verification sequencing | `skills/b0rks-uiux/references/evaluation-playbook.md` |
+| Small reusable component contracts and agent integration | `skills/b0rks-uiux/references/component-library.md` |
+| One TS source file per editable control | `skills/b0rks-uiux/assets/components/*.ts` |
+| Local visual preview, event traces and Playwright tests | `playground/` |
 | Standards provenance and 2026 source map | `skills/b0rks-uiux/references/research-addendum-2026.md` |
 | Provenance / attribution / verification status | `skills/b0rks-uiux/references/sources.md` |
 | Per-project rejections and preferences | `.b0x/` via the `b0x_*` MCP tools |
@@ -33,6 +36,12 @@ If you cannot state the observable user consequence of your guidance, it is a pr
 | Triggering behavior | `SKILL.md` frontmatter `description` |
 
 **Keep `SKILL.md` lean.** It loads in full whenever the skill triggers. Move anything that is only needed for a specific subtask into a reference file and link to it — that is the progressive disclosure the repo relies on to stay cheap in context. Every reference file must be reachable from `SKILL.md`; the validator fails on orphans.
+
+## Component example contribution checklist
+
+Keep each primitive in one standalone TypeScript source file under the **installable** skill's `assets/components/` directory. Prefer native semantics, exposed CSS custom properties and Shadow Parts, typed properties/events, complete focus/keyboard behavior, and no shared runtime helpers. The playground imports the real source instead of duplicating implementations. For each component, add a live catalog example and a Playwright interaction test, and document its usage limits and form-association status in `references/component-library.md`. A component's visual theme is only a reference, not a new default for all products.
+
+Run `npm run components:check`, `npm run components:test` and `./scripts/validate.sh` before review. See [playground/README.md](playground/README.md).
 
 ## Per-project memory
 
