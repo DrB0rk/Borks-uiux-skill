@@ -49,7 +49,7 @@ b0x engine automatically:
   • distills a clean imperative directive
   • classifies kind (rejection / preference / praise)
   • extracts domain tags
-  • detects conflicts and auto-supersedes stale rules
+  • detects potential conflicts and asks for review rather than deleting old rules
   • reinforces repeated preferences (tracks reinforcement count)
         ↓
 next session / turn: b0x_context({ role?: '...' })
@@ -112,7 +112,7 @@ Never leave two entries that contradict each other.
 | `b0x_roles` | Inspect or list global roles (`ui-engineer`, `ui-auditor`, `content-designer`, `motion-specialist`, `accessibility-specialist`) |
 | `b0x_status` | Status of global repository baseline, user global, and local project memory |
 | `b0x_context` | Read unified memory before designing. Supports optional `{ role: '...' }` spotlight. **Call this first.** |
-| `b0x_learn` | **Automated learning engine:** parse conversational user feedback, distill clean directives, auto-supersede conflicting rules, reinforce duplicates |
+| `b0x_learn` | **Automated learning engine:** parse conversational user feedback, distill clean directives, flag possible conflicts without deleting old rules, reinforce duplicates |
 | `b0x_learn_from_audit` | Permanently record a verified diagnostic audit fix as a project preference |
 | `b0x_record` | Manual fallback to store durable feedback (`scope: "project"` or `scope: "global"`) |
 | `b0x_list` | Inspect entries, with `kind` and `scope` filters |
