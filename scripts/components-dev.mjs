@@ -9,7 +9,7 @@ const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const compiler=resolve(root,'node_modules/typescript/bin/tsc');
 const child=spawn(process.execPath,[compiler,'-p',resolve(root,'tsconfig.components.json'),'--watch'],{stdio:'inherit'});
 const clients=new Set();let changed;
-for(const folder of ['playground','skills/b0rks-uiux/assets/components']){watch(resolve(root,folder),{recursive:true},(_,filename)=>{if(filename?.includes('dist/'))return;clearTimeout(changed);changed=setTimeout(()=>{for(const client of clients)client.write('data: update\\n\\n')},250)})}
+for(const folder of ['playground','skills/b0rks-uiux/assets/components']){watch(resolve(root,folder),{recursive:true},(_,filename)=>{if(filename?.includes('dist/'))return;clearTimeout(changed);changed=setTimeout(()=>{for(const client of clients)client.write('data: update\n\n')},250)})}
 const mime={'.html':'text/html','.css':'text/css','.js':'text/javascript'};
 const server=createServer((req,res)=>{
  const url=new URL(req.url??'/', 'http://127.0.0.1');
